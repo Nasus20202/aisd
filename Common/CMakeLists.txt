@@ -3,4 +3,4 @@ project(Common)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Common main.cpp)
+add_executable(Common main.cpp List.h)
