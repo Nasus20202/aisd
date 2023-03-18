@@ -23,6 +23,8 @@ public:
     bool operator==(char array[]);
     List<String>& split(char c);
     stringSize_t length() const;
+    stringSize_t size() const;
+    stringSize_t getSize() const;
     void remove(char c);
     void remove(stringSize_t index);
     void empty();

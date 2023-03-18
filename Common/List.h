@@ -29,7 +29,7 @@ protected:
     };
 
     Node *first = nullptr, *last = nullptr;
-    listSize_t size = 0;
+    listSize_t _size = 0;
 
 public:
     List();
@@ -44,6 +44,8 @@ public:
     List<T>& operator+=(List &other);
     bool operator==(List &other);
     listSize_t getSize() const;
+    listSize_t length() const;
+    listSize_t size() const;
     void remove(listSize_t index);
     void remove(T &element);
     void empty();
@@ -54,6 +56,7 @@ protected:
     Node* getNodeOfElement(listSize_t n, listSize_t &current);
 };
 
+
 template<typename T>
 void List<T>::empty() {
     Node *node = first, *copy;
@@ -63,16 +66,16 @@ void List<T>::empty() {
         delete copy;
     }
     last = first = nullptr;
-    size = 0;
+    _size = 0;
 }
 
 template<typename T>
 bool List<T>::operator==(List &other) {
     if(this == &other)
         return true;
-    if(size != other.getSize())
+    if(_size != other.getSize())
         return false;
-    for(int i = 0; i < size; i++){
+    for(int i = 0; i < _size; i++){
         if((*this)[i] != other[i])
             return false;
     }
@@ -107,7 +110,7 @@ template<typename T>
 List<T>::List() {}
 
 template<typename T>
-List<T>::List(List &other) : first(nullptr), last(nullptr), size(0){
+List<T>::List(List &other) : first(nullptr), last(nullptr), _size(0){
     for(int i = 0; i < other.getSize(); i++){
         pushBack(other[i]);
     }
@@ -137,7 +140,7 @@ List<T> &List<T>::operator=(List &other) {
     List temp = other;
     swap(first, temp.first);
     swap(last, temp.last);
-    size = temp.size;
+    _size = temp._size;
     return *this;
 }
 
@@ -184,7 +187,7 @@ void List<T>::pushBack(T &element) {
     } else {
         last->add(element);
     }
-    size++;
+    _size++;
 }
 
 template<typename T>
@@ -202,7 +205,7 @@ void List<T>::pushBack(T &&element) {
     } else {
         last->add(element);
     }
-    size++;
+    _size++;
 }
 
 
@@ -223,7 +226,7 @@ void List<T>::remove(List::listSize_t index) {
     typename Node::Element* element = getElementFromNode(node, index, current);
     element->free = true;
     node->elementCount--;
-    size--; bool empty = true;
+    _size--; bool empty = true;
     for(int i = 0; i < blockSize; i++){
         if(!node->elements[i].free){
             empty = false;
@@ -245,10 +248,10 @@ void List<T>::remove(List::listSize_t index) {
 
 template<typename T>
 typename List<T>::Node *List<T>::getNodeOfElement(List::listSize_t n, List::listSize_t &current) {
-    if(n > size)
+    if(n > _size)
         return nullptr;
     Node* node;
-    if(n < size/2){ // start from the last
+    if(n < _size / 2){ // start from the last
         node = first; current = 0;
         while(current + node->elementCount <= n){
             current += node->elementCount;
@@ -257,7 +260,7 @@ typename List<T>::Node *List<T>::getNodeOfElement(List::listSize_t n, List::list
         return node;
 
     } else {        // start from the first
-        node = last; current = size-1;
+        node = last; current = _size - 1;
         while(current >= node->elementCount && current - node->elementCount >= n){
             current -= node->elementCount;
             node = node->previous;
@@ -274,7 +277,7 @@ typename List<T>::Node *List<T>::getNodeOfElement(List::listSize_t n) {
 
 template<typename T>
 typename List<T>::Node::Element *List<T>::getElementFromNode(List::Node *node, List::listSize_t n, List::listSize_t &current) {
-    if(n < size/2){ // start from the last
+    if(n < _size / 2){ // start from the last
         typename List<T>::Node::Element *element = node->elements;
         while(current != n || element->free){
             if(!element->free && current < n)
@@ -296,7 +299,7 @@ typename List<T>::Node::Element *List<T>::getElementFromNode(List::Node *node, L
 
 template<typename T>
 typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
-    if(n > size)
+    if(n > _size)
         return nullptr;
     listSize_t current;
     Node* node = getNodeOfElement(n, current);
@@ -305,5 +308,15 @@ typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
 
 template<typename T>
 typename List<T>::listSize_t List<T>::getSize() const {
-    return size;
+    return _size;
+}
+
+template<typename T>
+typename List<T>::listSize_t List<T>::length() const {
+    return getSize();
+}
+
+template<typename T>
+typename List<T>::listSize_t List<T>::size() const {
+    return getSize();
 }

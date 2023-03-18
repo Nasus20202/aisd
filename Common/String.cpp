@@ -82,14 +82,21 @@ bool String::operator==(char *array) {
 
 List<String>& String::split(char c) {
     List<String> *list = new List<String>();
+    String s; char currentChar;
     for(stringSize_t i = 0; i < length(); i++){
-
+        currentChar = (*this)[i];
+        if(currentChar == c){
+            if(s.length() > 0)
+                list->pushBack(s);
+            s.empty();
+        }
+        else {
+            s += currentChar;
+        }
     }
+    if(s.length()>0)
+        list->pushBack(s);
     return *list;
-}
-
-String::stringSize_t String::length() const {
-    return characters.getSize();
 }
 
 void String::remove(char c) {
@@ -122,6 +129,15 @@ std::istream &operator>>(std::istream &is, String &s) {
             s.characters.pushBack(c);
     }
     return is;
+}
+String::stringSize_t String::getSize() const {
+    return characters.getSize();
+}
+String::stringSize_t String::size() const {
+    return getSize();
+}
+String::stringSize_t String::length() const {
+    return getSize();
 }
 
 
