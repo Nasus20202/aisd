@@ -17,16 +17,22 @@ public:
     String& operator=(char array[]);
     String& operator+(String &other);
     String& operator+=(String &other);
+    String& operator+(char array[]);
+    String& operator+=(char array[]);
     String& operator+(char c);
     String& operator+=(char c);
     bool operator==(String &other);
     bool operator==(char array[]);
     List<String>& split(char c);
+    List<String>& split(String &other);
     stringSize_t length() const;
     stringSize_t size() const;
     stringSize_t getSize() const;
+    bool contains(String &other);
+    bool contains(char* array);
     void remove(char c);
     void remove(stringSize_t index);
+    void remove(String &other);
     void empty();
 protected:
     friend std::ostream& operator<<(std::ostream &os, String& s);
