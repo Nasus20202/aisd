@@ -94,6 +94,14 @@ String &String::operator+=(char *array) {
     return *this;
 }
 
+bool String::operator!=(String &other) {
+    return !(*this == other);
+}
+
+bool String::operator!=(char *array) {
+    return !(*this == array);
+}
+
 
 List<String>& String::split(char c) {
     List<String> *list = new List<String>();
@@ -232,4 +240,3 @@ bool String::contains(String &other) {
     }
     return false;
 }
-

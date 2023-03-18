@@ -23,6 +23,8 @@ public:
     String& operator+=(char c);
     bool operator==(String &other);
     bool operator==(char array[]);
+    bool operator!=(String &other);
+    bool operator!=(char array[]);
     List<String>& split(char c);
     List<String>& split(String &other);
     stringSize_t length() const;
