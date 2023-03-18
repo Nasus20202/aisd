@@ -10,9 +10,10 @@ void swap(T& t1, T& t2){
 
 template<typename T>
 class List {
+public:
+    typedef unsigned long listSize_t;       // max amount of elements in the list
 protected:
     typedef unsigned char blockSize_t;      // integer type that is capable of storing blockSize
-    typedef unsigned long listSize_t;       // max amount of elements in the list
     static const blockSize_t blockSize = 8; // max number of elements allocated in one node
 
     struct Node {
@@ -32,9 +33,9 @@ protected:
 
 public:
     List();
-    List(std::initializer_list<T> list);
     ~List();
     List(List &other);
+    List(std::initializer_list<T> list);
     void pushBack (T &element);
     void pushBack (T &&element);
     T& operator[](listSize_t index);
@@ -42,15 +43,28 @@ public:
     List<T>& operator+(List &other);
     List<T>& operator+=(List &other);
     bool operator==(List &other);
-    long getSize() const;
+    listSize_t getSize() const;
     void remove(listSize_t index);
     void remove(T &element);
+    void empty();
 protected:
     typename Node::Element* getElement(listSize_t n);
     typename Node::Element* getElementFromNode(Node* node, listSize_t n, listSize_t &current);
     Node* getNodeOfElement(listSize_t n);
     Node* getNodeOfElement(listSize_t n, listSize_t &current);
 };
+
+template<typename T>
+void List<T>::empty() {
+    Node *node = first, *copy;
+    while(node != nullptr){
+        copy = node;
+        node = node->next;
+        delete copy;
+    }
+    last = first = nullptr;
+    size = 0;
+}
 
 template<typename T>
 bool List<T>::operator==(List &other) {
@@ -93,26 +107,22 @@ template<typename T>
 List<T>::List() {}
 
 template<typename T>
-List<T>::List(std::initializer_list<T> list) {
-    for(T elem : list)
-        pushBack(elem);
-}
-
-template<typename T>
 List<T>::List(List &other) : first(nullptr), last(nullptr), size(0){
     for(int i = 0; i < other.getSize(); i++){
         pushBack(other[i]);
     }
 }
 
+
+template<typename T>
+List<T>::List(std::initializer_list<T> list) {
+    for(T elem : list)
+        pushBack(elem);
+}
+
 template<typename T>
 List<T>::~List() {
-    Node *node = first, *copy;
-    while(node != nullptr){
-        copy = node;
-        node = node->next;
-        delete copy;
-    }
+    empty();
 }
 
 template<typename T>
@@ -294,6 +304,6 @@ typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
 }
 
 template<typename T>
-long List<T>::getSize() const {
+typename List<T>::listSize_t List<T>::getSize() const {
     return size;
 }
