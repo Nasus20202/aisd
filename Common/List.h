@@ -2,6 +2,13 @@
 #include <initializer_list>
 
 template<typename T>
+void swap(T& t1, T& t2){
+    T temp = t1;
+    t1 = t2;
+    t2 = temp;
+}
+
+template<typename T>
 class List {
 protected:
     typedef unsigned char blockSize_t;      // integer type that is capable of storing blockSize
@@ -118,8 +125,8 @@ List<T> &List<T>::operator=(List &other) {
     if(this == &other)
         return *this;
     List temp = other;
-    std::swap(first, temp.first);
-    std::swap(last, temp.last);
+    swap(first, temp.first);
+    swap(last, temp.last);
     size = temp.size;
     return *this;
 }
@@ -142,7 +149,7 @@ template<typename T>
 void List<T>::Node::add(T &&value) {
     if(freeSpace > 0){
         Node::Element element;
-        element.value = std::move(value);
+        element.value = value;
         element.free = false;
         elements[blockSize-freeSpace] = element;
         elementCount++;
@@ -178,12 +185,12 @@ void List<T>::pushBack(T &&element) {
     }
     if(last->freeSpace == 0){
         Node* newNode = new Node();
-        newNode->add(std::move(element));
+        newNode->add(element);
         last->next = newNode;
         newNode->previous = last;
         last = newNode;
     } else {
-        last->add(std::move(element));
+        last->add(element);
     }
     size++;
 }
