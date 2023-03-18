@@ -32,12 +32,46 @@ public:
     void pushBack (T &&element);
     T& operator[](listSize_t index);
     List<T>& operator=(List &other);
+    List<T>& operator+(List &other);
+    List<T>& operator+=(List &other);
+    bool operator==(List &other);
     long getSize() const;
     void remove(listSize_t index);
+    void remove(T &element);
 protected:
     typename Node::Element* getElement(listSize_t n);
+    typename Node::Element* getElementFromNode(Node* node, listSize_t n, listSize_t &current);
     Node* getNodeOfElement(listSize_t n);
+    Node* getNodeOfElement(listSize_t n, listSize_t &current);
 };
+
+template<typename T>
+bool List<T>::operator==(List &other) {
+    if(this == &other)
+        return true;
+    if(size != other.getSize())
+        return false;
+    for(int i = 0; i < size; i++){
+        if((*this)[i] != other[i])
+            return false;
+    }
+    return true;
+}
+
+template<typename T>
+List<T> &List<T>::operator+=(List &other) {
+    for(int i = 0; i < other.getSize(); i++){
+        pushBack(other[i]);
+    }
+    return *this;
+}
+
+template<typename T>
+List<T> &List<T>::operator+(List &other) {
+    List<T> temp = *this;
+    temp += other;
+    return temp;
+}
 
 template<typename T>
 List<T>::List() {}
@@ -72,6 +106,8 @@ T &List<T>::operator[](listSize_t index) {
 
 template<typename T>
 List<T> &List<T>::operator=(List &other) {
+    if(this == &other)
+        return *this;
     List temp = other;
     std::swap(first, temp.first);
     std::swap(last, temp.last);
@@ -145,22 +181,74 @@ void List<T>::pushBack(T &&element) {
 
 
 template<typename T>
-void List<T>::remove(List::listSize_t index) {
-
+void List<T>::remove(T &element) {
+    for(int i = 0; i < getSize(); i++){
+        if((*this)[i] == element){
+            remove(i);
+            i--;
+        }
+    }
 }
 
+template<typename T>
+void List<T>::remove(List::listSize_t index) {
+    listSize_t current;
+    Node* node = getNodeOfElement(index, current);
+    typename Node::Element* element = getElementFromNode(node, index, current);
+    element->free = true;
+    node->elementCount--;
+    size--; bool empty = true;
+    for(int i = 0; i < blockSize; i++){
+        if(!node->elements[i].free){
+            empty = false;
+            break;
+        }
+    }
+    if(empty){
+        if(node->previous != nullptr)
+            node->previous->next = node->next;
+        if(node->next != nullptr)
+            node->next->previous = node->previous;
+        if(node == first)
+            first = node->next;
+        if(node == last)
+            last = node->previous;
+        delete node;
+    }
+}
 
 template<typename T>
-typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
+typename List<T>::Node *List<T>::getNodeOfElement(List::listSize_t n, List::listSize_t &current) {
     if(n > size)
         return nullptr;
-    Node* node; listSize_t current;
+    Node* node;
     if(n < size/2){ // start from the last
         node = first; current = 0;
         while(current + node->elementCount <= n){
             current += node->elementCount;
             node = node->next;
         }
+        return node;
+
+    } else {        // start from the first
+        node = last; current = size-1;
+        while(current >= node->elementCount && current - node->elementCount >= n){
+            current -= node->elementCount;
+            node = node->previous;
+        }
+        return node;
+    }
+}
+
+template<typename T>
+typename List<T>::Node *List<T>::getNodeOfElement(List::listSize_t n) {
+    listSize_t current;
+    getNodeOfElement(n, current);
+}
+
+template<typename T>
+typename List<T>::Node::Element *List<T>::getElementFromNode(List::Node *node, List::listSize_t n, List::listSize_t &current) {
+    if(n < size/2){ // start from the last
         typename List<T>::Node::Element *element = node->elements;
         while(current != n || element->free){
             if(!element->free && current < n)
@@ -170,11 +258,6 @@ typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
         return element;
 
     } else {        // start from the first
-        node = last; current = size-1;
-        while(current >= node->elementCount && current - node->elementCount >= n){
-            current -= node->elementCount;
-            node = node->previous;
-        }
         typename List<T>::Node::Element *element = &node->elements[List<T>::blockSize-1]; // start from last one in that block
         while(current != n || element->free){
             if(!element->free && current > n)
@@ -183,6 +266,15 @@ typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
         }
         return element;
     }
+}
+
+template<typename T>
+typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
+    if(n > size)
+        return nullptr;
+    listSize_t current;
+    Node* node = getNodeOfElement(n, current);
+    return getElementFromNode(node, n, current);
 }
 
 template<typename T>
