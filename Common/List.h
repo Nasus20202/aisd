@@ -60,17 +60,26 @@ bool List<T>::operator==(List &other) {
 
 template<typename T>
 List<T> &List<T>::operator+=(List &other) {
-    for(int i = 0; i < other.getSize(); i++){
-        pushBack(other[i]);
+    if(this == &other){
+        List<T> newList = *this;
+        for(int i = 0; i < other.getSize(); i++){
+            newList.pushBack(other[i]);
+        }
+        *this = newList;
+    } else {
+        for (int i = 0; i < other.getSize(); i++) {
+            pushBack(other[i]);
+        }
     }
     return *this;
 }
 
 template<typename T>
 List<T> &List<T>::operator+(List &other) {
-    List<T> temp = *this;
-    temp += other;
-    return temp;
+    List<T> *temp = new List<T>();
+    *temp += *this;
+    *temp += other;
+    return *temp;
 }
 
 template<typename T>
