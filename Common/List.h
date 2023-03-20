@@ -7,7 +7,7 @@ void swap(T& t1, T& t2){
     t1 = t2;
     t2 = temp;
 }
-typedef unsigned int blockSize_t;      // integer type that is capable of storing blockSize
+typedef unsigned char blockSize_t;      // integer type that is capable of storing blockSize
 template<typename T, blockSize_t blockSize = 8>
 class List {
 public:
