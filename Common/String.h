@@ -6,7 +6,7 @@ class String {
 public:
     typedef List<char>::listSize_t stringSize_t;
 protected:
-    static const blockSize_t blockSize = 64;
+    static const blockSize_t blockSize = 255;
     typedef List<char, blockSize> charList;
     charList characters;
 public:
