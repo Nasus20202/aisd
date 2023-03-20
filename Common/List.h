@@ -7,15 +7,12 @@ void swap(T& t1, T& t2){
     t1 = t2;
     t2 = temp;
 }
-
-template<typename T>
+typedef unsigned int blockSize_t;      // integer type that is capable of storing blockSize
+template<typename T, blockSize_t blockSize = 8>
 class List {
 public:
     typedef unsigned long listSize_t;       // max amount of elements in the list
 protected:
-    typedef unsigned char blockSize_t;      // integer type that is capable of storing blockSize
-    static const blockSize_t blockSize = 8; // max number of elements allocated in one node
-
     struct Node {
         struct Element{
             T value;
@@ -39,9 +36,9 @@ public:
     void pushBack (T &element);
     void pushBack (T &&element);
     T& operator[](listSize_t index);
-    List<T>& operator=(List &other);
-    List<T>& operator+(List &other);
-    List<T>& operator+=(List &other);
+    List<T, blockSize>& operator=(List &other);
+    List<T, blockSize>& operator+(List &other);
+    List<T, blockSize>& operator+=(List &other);
     bool operator==(List &other);
     listSize_t getSize() const;
     listSize_t length() const;
@@ -57,8 +54,8 @@ protected:
 };
 
 
-template<typename T>
-void List<T>::empty() {
+template<typename T, blockSize_t blockSize>
+void List<T, blockSize>::empty() {
     Node *node = first, *copy;
     while(node != nullptr){
         copy = node;
@@ -69,8 +66,8 @@ void List<T>::empty() {
     _size = 0;
 }
 
-template<typename T>
-bool List<T>::operator==(List &other) {
+template<typename T, blockSize_t blockSize>
+bool List<T, blockSize>::operator==(List &other) {
     if(this == &other)
         return true;
     if(_size != other.getSize())
@@ -82,10 +79,10 @@ bool List<T>::operator==(List &other) {
     return true;
 }
 
-template<typename T>
-List<T> &List<T>::operator+=(List &other) {
+template<typename T, blockSize_t blockSize>
+List<T, blockSize> &List<T, blockSize>::operator+=(List &other) {
     if(this == &other){
-        List<T> newList = *this;
+        List<T, blockSize> newList = *this;
         for(int i = 0; i < other.getSize(); i++){
             newList.pushBack(other[i]);
         }
@@ -98,43 +95,43 @@ List<T> &List<T>::operator+=(List &other) {
     return *this;
 }
 
-template<typename T>
-List<T> &List<T>::operator+(List &other) {
-    List<T> *temp = new List<T>();
+template<typename T, blockSize_t blockSize>
+List<T, blockSize> &List<T, blockSize>::operator+(List &other) {
+    List<T, blockSize> *temp = new List<T, blockSize>();
     *temp += *this;
     *temp += other;
     return *temp;
 }
 
-template<typename T>
-List<T>::List() {}
+template<typename T, blockSize_t blockSize>
+List<T, blockSize>::List() {}
 
-template<typename T>
-List<T>::List(List &other) : first(nullptr), last(nullptr), _size(0){
+template<typename T, blockSize_t blockSize>
+List<T, blockSize>::List(List &other) : first(nullptr), last(nullptr), _size(0){
     for(int i = 0; i < other.getSize(); i++){
         pushBack(other[i]);
     }
 }
 
 
-template<typename T>
-List<T>::List(std::initializer_list<T> list) {
+template<typename T, blockSize_t blockSize>
+List<T, blockSize>::List(std::initializer_list<T> list) {
     for(T elem : list)
         pushBack(elem);
 }
 
-template<typename T>
-List<T>::~List() {
+template<typename T, blockSize_t blockSize>
+List<T, blockSize>::~List() {
     empty();
 }
 
-template<typename T>
-T &List<T>::operator[](listSize_t index) {
+template<typename T, blockSize_t blockSize>
+T &List<T, blockSize>::operator[](listSize_t index) {
     return getElement(index)->value;
 }
 
-template<typename T>
-List<T> &List<T>::operator=(List &other) {
+template<typename T, blockSize_t blockSize>
+List<T, blockSize> &List<T, blockSize>::operator=(List &other) {
     if(this == &other)
         return *this;
     List temp = other;
@@ -144,8 +141,8 @@ List<T> &List<T>::operator=(List &other) {
     return *this;
 }
 
-template<typename T>
-void List<T>::Node::add(T &value) {
+template<typename T, blockSize_t blockSize>
+void List<T, blockSize>::Node::add(T &value) {
     if(freeSpace > 0){
         Node::Element element;
         element.value = value;
@@ -158,8 +155,8 @@ void List<T>::Node::add(T &value) {
     }
 }
 
-template<typename T>
-void List<T>::Node::add(T &&value) {
+template<typename T, blockSize_t blockSize>
+void List<T, blockSize>::Node::add(T &&value) {
     if(freeSpace > 0){
         Node::Element element;
         element.value = value;
@@ -172,8 +169,8 @@ void List<T>::Node::add(T &&value) {
     }
 }
 
-template<typename T>
-void List<T>::pushBack(T &element) {
+template<typename T, blockSize_t blockSize>
+void List<T, blockSize>::pushBack(T &element) {
     if(first == nullptr){
         first = new Node();
         last = first;
@@ -190,8 +187,8 @@ void List<T>::pushBack(T &element) {
     _size++;
 }
 
-template<typename T>
-void List<T>::pushBack(T &&element) {
+template<typename T, blockSize_t blockSize>
+void List<T, blockSize>::pushBack(T &&element) {
     if(first == nullptr){
         first = new Node();
         last = first;
@@ -209,8 +206,8 @@ void List<T>::pushBack(T &&element) {
 }
 
 
-template<typename T>
-void List<T>::remove(T &element) {
+template<typename T, blockSize_t blockSize>
+void List<T, blockSize>::remove(T &element) {
     for(int i = 0; i < getSize(); i++){
         if((*this)[i] == element){
             remove(i);
@@ -219,8 +216,8 @@ void List<T>::remove(T &element) {
     }
 }
 
-template<typename T>
-void List<T>::remove(List::listSize_t index) {
+template<typename T, blockSize_t blockSize>
+void List<T, blockSize>::remove(List::listSize_t index) {
     listSize_t current;
     Node* node = getNodeOfElement(index, current);
     typename Node::Element* element = getElementFromNode(node, index, current);
@@ -246,8 +243,8 @@ void List<T>::remove(List::listSize_t index) {
     }
 }
 
-template<typename T>
-typename List<T>::Node *List<T>::getNodeOfElement(List::listSize_t n, List::listSize_t &current) {
+template<typename T, blockSize_t blockSize>
+typename List<T, blockSize>::Node *List<T, blockSize>::getNodeOfElement(List::listSize_t n, List::listSize_t &current) {
     if(n > _size)
         return nullptr;
     Node* node;
@@ -269,16 +266,16 @@ typename List<T>::Node *List<T>::getNodeOfElement(List::listSize_t n, List::list
     }
 }
 
-template<typename T>
-typename List<T>::Node *List<T>::getNodeOfElement(List::listSize_t n) {
+template<typename T, blockSize_t blockSize>
+typename List<T, blockSize>::Node *List<T, blockSize>::getNodeOfElement(List::listSize_t n) {
     listSize_t current;
     getNodeOfElement(n, current);
 }
 
-template<typename T>
-typename List<T>::Node::Element *List<T>::getElementFromNode(List::Node *node, List::listSize_t n, List::listSize_t &current) {
+template<typename T, blockSize_t blockSize>
+typename List<T, blockSize>::Node::Element *List<T, blockSize>::getElementFromNode(List::Node *node, List::listSize_t n, List::listSize_t &current) {
     if(n < _size / 2){ // start from the last
-        typename List<T>::Node::Element *element = node->elements;
+        typename List<T, blockSize>::Node::Element *element = node->elements;
         while(current != n || element->free){
             if(!element->free && current < n)
                 current++;
@@ -287,7 +284,7 @@ typename List<T>::Node::Element *List<T>::getElementFromNode(List::Node *node, L
         return element;
 
     } else {        // start from the first
-        typename List<T>::Node::Element *element = &node->elements[List<T>::blockSize-1]; // start from last one in that block
+        typename List<T, blockSize>::Node::Element *element = &node->elements[blockSize-1]; // start from last one in that block
         while(current != n || element->free){
             if(!element->free && current > n)
                 current--;
@@ -297,8 +294,8 @@ typename List<T>::Node::Element *List<T>::getElementFromNode(List::Node *node, L
     }
 }
 
-template<typename T>
-typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
+template<typename T, blockSize_t blockSize>
+typename List<T, blockSize>::Node::Element *List<T, blockSize>::getElement(List::listSize_t n) {
     if(n > _size)
         return nullptr;
     listSize_t current;
@@ -306,17 +303,17 @@ typename List<T>::Node::Element *List<T>::getElement(List::listSize_t n) {
     return getElementFromNode(node, n, current);
 }
 
-template<typename T>
-typename List<T>::listSize_t List<T>::getSize() const {
+template<typename T, blockSize_t blockSize>
+typename List<T, blockSize>::listSize_t List<T, blockSize>::getSize() const {
     return _size;
 }
 
-template<typename T>
-typename List<T>::listSize_t List<T>::length() const {
+template<typename T, blockSize_t blockSize>
+typename List<T, blockSize>::listSize_t List<T, blockSize>::length() const {
     return getSize();
 }
 
-template<typename T>
-typename List<T>::listSize_t List<T>::size() const {
+template<typename T, blockSize_t blockSize>
+typename List<T, blockSize>::listSize_t List<T, blockSize>::size() const {
     return getSize();
 }
