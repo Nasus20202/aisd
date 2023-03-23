@@ -10,6 +10,7 @@ struct Block {
     String selector;
     List<String> selectors;
     List<Attribute> attributes;
+    Block();
     Block(String& selector);
 };
 

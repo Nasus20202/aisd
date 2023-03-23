@@ -44,21 +44,20 @@ void CssParser::parse(String &line) {
         if(isGlobalAttribute(line)){
             addToBlock(line);
         } else {
-            bool has = line.contains('{');
-            if(has){
-                int a = 0;
-            }
-            List<String> parts = line.split('{');
-            if(parts.size() == 0){
+            if(line.contains('{'))
                 blockOpen = true;
+            List<String> parts = line.split('{');
+            if(parts.size() == 0)
                 return;
-            }
             String selector = parts[0];
+            removeUselessWhitespace(selector);
             Block* block = getBlock(selector);
             if(block != nullptr){
                 currentBlock = block;
             } else {
                 Block newBlock(selector);
+                blocks.pushBack(newBlock);
+                currentBlock = getBlock(selector);
             }
         }
     }
@@ -77,26 +76,19 @@ bool CssParser::isGlobalAttribute(String &line) {
     return false;
 }
 
-void CssParser::removeUselessWhitespace(String &line) {
-    while(line[0] == '\t' || line[0] == ' ')
-        line.remove((String::stringSize_t)0);
-    while(line[line.size()-1] == ' ' || line[line.size()-1] == '\t')
-        line.remove(line.size()-1);
-}
-
 void CssParser::addToBlock(String &line) {
     List<String> attributes = line.split(';');
     for(int i = 0; i < attributes.size(); i++){
         List<String> attribute = attributes[i].split(':');
         Attribute a;
-        a.name = attribute[0];
-        a.value = attribute[1];
         removeUselessWhitespace(attribute[0]);
         removeUselessWhitespace(attribute[1]);
-        /*if(blockOpen)
+        a.name = attribute[0];
+        a.value = attribute[1];
+        if(blockOpen)
             currentBlock->attributes.pushBack(a);
         else
-            globalAttributes.pushBack(a);*/
+            globalAttributes.pushBack(a);
     }
 }
 
@@ -113,6 +105,14 @@ Block* CssParser::getBlock(String &selector) {
     return nullptr;
 }
 
+
+void CssParser::removeUselessWhitespace(String &line) {
+    while(line[0] == '\t' || line[0] == ' ')
+        line.remove((String::stringSize_t)0);
+    while(line[line.size()-1] == ' ' || line[line.size()-1] == '\t')
+        line.remove(line.size()-1);
+}
+
 Block::Block(String &selector) {
     this->selector = selector;
     List<String> selectors = selector.split(',');
@@ -120,3 +120,6 @@ Block::Block(String &selector) {
         CssParser::removeUselessWhitespace(selectors[i]);
     this->selectors = selectors;
 }
+
+Block::Block() : selector(), selectors(), attributes() {}
+
