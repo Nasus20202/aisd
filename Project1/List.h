@@ -1,5 +1,4 @@
 #pragma once
-#include <initializer_list>
 
 template<typename T>
 void swap(T& t1, T& t2){
@@ -32,7 +31,6 @@ public:
     List();
     ~List();
     List(List &other);
-    List(std::initializer_list<T> list);
     void pushBack (T &element);
     void pushBack (T &&element);
     T& operator[](listSize_t index);
@@ -113,13 +111,6 @@ List<T, blockSize>::List(List &other) : first(nullptr), last(nullptr), _size(0){
     for(int i = 0; i < other.getSize(); i++){
         pushBack(other[i]);
     }
-}
-
-
-template<typename T, blockSize_t blockSize>
-List<T, blockSize>::List(std::initializer_list<T> list) {
-    for(T elem : list)
-        pushBack(elem);
 }
 
 template<typename T, blockSize_t blockSize>

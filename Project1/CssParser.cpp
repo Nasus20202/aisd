@@ -72,11 +72,14 @@ void CssParser::query(String &query) {
         }
         // z,S,?
         else if(second == 'S' && third[0] == '?'){
-
+            cout << query << " == " << countSelector(first) << endl;
         }
         // z,E,n
         else if(second == 'E'){
-
+            Attribute* attribute = getAttributeForSelector(first, third);
+            if(attribute == nullptr)
+                return;
+            cout << query << " == " << attribute->value << endl;
         }
         // i,D,*
         else if(isFirstInt && second == 'D' && third[0] == '*'){
@@ -93,8 +96,43 @@ void CssParser::query(String &query) {
     }
 }
 
+Attribute* CssParser::getAttributeForSelector(String &selector, String &attribute) {
+    blockNode* blockNode = blocks.first;
+    Attribute* result = nullptr;
+    while(blockNode != nullptr){
+        for(auto & blockElement : blockNode->elements){
+            if(!blockElement.free){
+                bool containsSelector = false;
+                List<String>::Node *selectorNode = blockElement.value.selectors.first;
+                while(selectorNode != nullptr){
+                    for(auto & selectorElement : selectorNode->elements){
+                        if(!selectorElement.free && selectorElement.value == selector) {
+                            containsSelector = true; break;
+                        }
+                    }if(containsSelector)
+                        break;
+                    selectorNode=selectorNode->next;
+                }
+                if(!containsSelector)
+                    continue;
+                Block::attributeNode* attributeNode = blockElement.value.attributes.first;
+                while(attributeNode != nullptr){
+                    for(auto & attributeElement : attributeNode->elements){
+                        if(!attributeElement.free && attributeElement.value.name == attribute) {
+                            result = &attributeElement.value;
+                        }
+                    }
+                    attributeNode = attributeNode->next;
+                }
+            }
+        }
+        blockNode = blockNode->next;
+    }
+    return result;
+}
+
 unsigned int CssParser::countAttribute(String &name) {
-    int count = 0;
+    unsigned int count = 0;
     blockNode* node = blocks.first;
     while(node != nullptr){
         for(auto & element : node->elements){
@@ -102,6 +140,24 @@ unsigned int CssParser::countAttribute(String &name) {
                 Attribute *attributeNode = element.value.getAttributeByName(name);
                 if(attributeNode != nullptr)
                     count++;
+            }
+        }
+        node = node->next;
+    }
+    return count;
+}
+
+unsigned int CssParser::countSelector(String &name) {
+    unsigned int  count = 0;
+    blockNode* node = blocks.first;
+    while(node != nullptr){
+        for(auto & element : node->elements){
+            if(!element.free) {
+                List<String> *selectors = &element.value.selectors;
+                for(int i = 0; i < selectors->size(); i++){
+                    if(selectors->operator[](i) == name)
+                        count++;
+                }
             }
         }
         node = node->next;
@@ -190,14 +246,15 @@ Block *CssParser::getLastBlock() {
 
 Block* CssParser::getBlock(String &selector) {
     blockNode* node = blocks.first;
+    Block* result = nullptr;
     while(node != nullptr){
         for(auto & element : node->elements){
             if(!element.free && element.value.selector == selector)
-                return &element.value;
+                result = &element.value;
         }
         node = node->next;
     }
-    return nullptr;
+    return result;
 }
 
 

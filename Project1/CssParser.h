@@ -34,4 +34,6 @@ public:
     Block *getBlock(String& selector); // returns nullptr if not found
     Block *getLastBlock();
     unsigned int countAttribute(String &name);
+    unsigned int countSelector(String &name);
+    Attribute* getAttributeForSelector(String &selector, String &attribute);
 };
