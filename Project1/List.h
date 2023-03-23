@@ -52,6 +52,7 @@ protected:
     Node* getNodeOfElement(listSize_t n);
     Node* getNodeOfElement(listSize_t n, listSize_t &current);
     friend class CssParser;
+    friend class Block;
 };
 
 

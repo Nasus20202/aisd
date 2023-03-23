@@ -244,3 +244,13 @@ bool String::contains(String &other) {
     }
     return false;
 }
+
+
+int String::toInt() {
+    int result = 0;
+    for(stringSize_t i = 0; i < size(); i++){
+        result *= 10;
+        result += (*this)[i] - '0';
+    }
+    return result;
+}

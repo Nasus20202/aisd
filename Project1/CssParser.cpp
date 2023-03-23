@@ -86,9 +86,9 @@ void CssParser::addToBlock(String &line) {
         a.name = attribute[0];
         a.value = attribute[1];
         if(blockOpen)
-            currentBlock->attributes.pushBack(a);
+            currentBlock->addAttribute(a);
         else
-            globalAttributes.pushBack(a);
+            globalBlock.addAttribute(a);
     }
 }
 
@@ -122,4 +122,19 @@ Block::Block(String &selector) {
 }
 
 Block::Block() : selector(), selectors(), attributes() {}
+
+void Block::addAttribute(Attribute &attribute) {
+    typedef List<Attribute>::Node blockNode;
+    blockNode* node = attributes.first;
+    while(node != nullptr){
+        for(auto & element : node->elements){
+            if(!element.free && element.value.name == attribute.name) {
+                element.value.name = attribute.value;
+                return;
+            }
+        }
+        node = node->next;
+    }
+    attributes.pushBack(attribute);
+}
 

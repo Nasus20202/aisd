@@ -37,6 +37,7 @@ public:
     void remove(stringSize_t index);
     void remove(String &other);
     void empty();
+    int toInt();
 protected:
     friend std::ostream& operator<<(std::ostream &os, String& s);
     friend std::istream& operator>>(std::istream &is, String& s);

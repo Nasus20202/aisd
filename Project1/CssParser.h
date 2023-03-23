@@ -12,12 +12,13 @@ struct Block {
     List<Attribute> attributes;
     Block();
     Block(String& selector);
+    void addAttribute(Attribute &attribute);
 };
 
 class CssParser {
 protected:
     List<Block> blocks;
-    List<Attribute> globalAttributes;
+    Block globalBlock;
     bool blockOpen = false;
     bool parsing = true;
     Block* currentBlock = nullptr;
