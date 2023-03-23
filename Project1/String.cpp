@@ -71,7 +71,7 @@ bool String::operator==(String &other) {
 bool String::operator==(char *array) {
     stringSize_t index = 0;
     while(*array != '\0'){
-        if(*array != (*this)[index])
+        if(index>=size() || *array != (*this)[index])
             return false;
         array++; index++;
     }
@@ -243,4 +243,21 @@ bool String::contains(String &other) {
         }
     }
     return false;
+}
+
+bool String::contains(char c) {
+    for(stringSize_t i = 0; i < size(); i++){
+        if((*this)[i] == c)
+            return true;
+    }
+    return false;
+}
+
+int String::toInt() {
+    int result = 0;
+    for(stringSize_t i = 0; i < size(); i++){
+        result *= 10;
+        result += (*this)[i] - '0';
+    }
+    return result;
 }

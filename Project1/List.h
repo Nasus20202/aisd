@@ -51,6 +51,7 @@ protected:
     typename Node::Element* getElementFromNode(Node* node, listSize_t n, listSize_t &current);
     Node* getNodeOfElement(listSize_t n);
     Node* getNodeOfElement(listSize_t n, listSize_t &current);
+    friend class CssParser;
 };
 
 

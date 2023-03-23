@@ -1,6 +1,12 @@
+#include "CssParser.h"
 #include <iostream>
+using namespace std;
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    CssParser parser;
+    String s;
+    while(!cin.eof()){
+        cin >> s;
+        parser.loadLine(s);
+    }
 }
