@@ -39,6 +39,7 @@ public:
     void remove(String &other);
     void empty();
     int toInt();
+    bool isInt();
 protected:
     friend std::ostream& operator<<(std::ostream &os, String& s);
     friend std::istream& operator>>(std::istream &is, String& s);

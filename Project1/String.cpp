@@ -261,3 +261,12 @@ int String::toInt() {
     }
     return result;
 }
+
+bool String::isInt() {
+    for(stringSize_t i = 0; i < size(); i++){
+        char c = (*this)[i];
+        if(c < '0' || c > '9')
+            return false;
+    }
+    return true;
+}

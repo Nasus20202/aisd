@@ -21,14 +21,92 @@ void CssParser::loadLine(String &line) {
 }
 
 void CssParser::query(String &query) {
-    cout << query << " == ";
     if(query == (char*) "?"){
-        cout << blocks.size();
+        cout << query << " == " << blocks.size() << endl;
     } else {
         List<String> commands = query.split(',');
-        char command = commands[1][0];
+        String first = commands[0];
+        char second = commands[1][0];
+        String third = commands[2];
+        bool isFirstInt = first.isInt(), isThirdInt = third.isInt();
+
+
+        // i,S,?
+        if(isFirstInt && second == 'S' && third[0] == '?'){
+            int id = commands[0].toInt();
+            if(id-1 >= blocks.size())
+                return;
+            cout << query << " == " << blocks[id-1].selectors.size() << endl;
+        }
+        // i,A,?
+        else if(isFirstInt && second == 'A' && third[0] == '?') {
+            int id = commands[0].toInt();
+            if(id-1 >= blocks.size())
+                return;
+            cout << query << " == " << blocks[id-1].attributes.size() << endl;
+        }
+        // i,S,j
+        else if(isFirstInt && second == 'S' && isThirdInt){
+            int blockId = first.toInt(), selectorId = third.toInt();
+            if(blockId-1 >= blocks.size())
+                return;
+            Block block = blocks[blockId-1];
+            if(selectorId-1 >= block.selectors.size())
+                return;
+            cout << query << " == " << block.selectors[selectorId-1] << endl;
+        }
+        // i,A,n
+        else if(isFirstInt && second == 'A'){
+            int blockId = first.toInt();
+            if(blockId-1 >= blocks.size())
+                return;
+            Block block = blocks[blockId-1];
+            Attribute *attribute = block.getAttributeByName(third);
+            if(attribute == nullptr)
+                return;
+            cout << query << " == " << attribute->value << endl;
+        }
+        // n,A,?
+        else if(second == 'A' && third[0] == '?'){
+            cout << query << " == " << countAttribute(first) << endl;
+        }
+        // z,S,?
+        else if(second == 'S' && third[0] == '?'){
+
+        }
+        // z,E,n
+        else if(second == 'E'){
+
+        }
+        // i,D,*
+        else if(isFirstInt && second == 'D' && third[0] == '*'){
+
+        }
+        // i,D,n
+        else if (isFirstInt && second == 'D'){
+
+        }
+        else {
+            cout << "Not found: " << query;
+            throw;
+        }
     }
-    cout << endl;
+}
+
+unsigned int CssParser::countAttribute(String &name) {
+    int count = 0;
+    blockNode* node = blocks.first;
+    while(node != nullptr){
+        for(auto & element : node->elements){
+            if(!element.free) {
+                Attribute *attributeNode = element.value.getAttributeByName(name);
+                if(attributeNode != nullptr)
+                    count++;
+            }
+        }
+        node = node->next;
+    }
+    return count;
 }
 
 void CssParser::parse(String &line) {
@@ -99,7 +177,6 @@ void CssParser::addToBlock(String &line) {
 }
 
 Block *CssParser::getLastBlock() {
-    typedef List<Block>::Node blockNode;
     blockNode *node = blocks.last;
     Block *block = nullptr;
     if(node == nullptr)
@@ -112,7 +189,6 @@ Block *CssParser::getLastBlock() {
 }
 
 Block* CssParser::getBlock(String &selector) {
-    typedef List<Block>::Node blockNode;
     blockNode* node = blocks.first;
     while(node != nullptr){
         for(auto & element : node->elements){
@@ -143,8 +219,7 @@ Block::Block(String &selector) : global(false) {
 Block::Block() : selector(), selectors(), attributes(), global(true) {}
 
 void Block::addAttribute(Attribute &attribute) {
-    typedef List<Attribute>::Node blockNode;
-    blockNode* node = attributes.first;
+    attributeNode* node = attributes.first;
     while(node != nullptr){
         for(auto & element : node->elements){
             if(!element.free && element.value.name == attribute.name) {
@@ -155,5 +230,18 @@ void Block::addAttribute(Attribute &attribute) {
         node = node->next;
     }
     attributes.pushBack(attribute);
+}
+
+Attribute* Block::getAttributeByName(String &name) {
+    attributeNode* node = attributes.first;
+    while(node != nullptr){
+        for(auto & element : node->elements){
+            if(!element.free && element.value.name == name) {
+                return &element.value;
+            }
+        }
+        node = node->next;
+    }
+    return nullptr;
 }
 
