@@ -10,6 +10,7 @@ struct Block {
     String selector;
     List<String> selectors;
     List<Attribute> attributes;
+    bool global;
     Block();
     Block(String& selector);
     void addAttribute(Attribute &attribute);
@@ -18,10 +19,8 @@ struct Block {
 class CssParser {
 protected:
     List<Block> blocks;
-    Block globalBlock;
     bool blockOpen = false;
     bool parsing = true;
-    Block* currentBlock = nullptr;
 public:
     void loadLine(String& line);
     void query(String &query);
@@ -30,4 +29,5 @@ public:
     static void removeUselessWhitespace(String &line);
     void addToBlock(String& line);
     Block *getBlock(String& selector); // returns nullptr if not found
+    Block *getLastBlock();
 };

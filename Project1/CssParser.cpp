@@ -42,6 +42,10 @@ void CssParser::parse(String &line) {
             addToBlock(parts[0]);
     } else {
         if(isGlobalAttribute(line)){
+            if(getLastBlock() == nullptr || !getLastBlock()->global){
+                Block block;
+                blocks.pushBack(block);
+            }
             addToBlock(line);
         } else {
             if(line.contains('{'))
@@ -51,13 +55,9 @@ void CssParser::parse(String &line) {
                 return;
             String selector = parts[0];
             removeUselessWhitespace(selector);
-            Block* block = getBlock(selector);
-            if(block != nullptr){
-                currentBlock = block;
-            } else {
-                Block newBlock(selector);
-                blocks.pushBack(newBlock);
-                currentBlock = getBlock(selector);
+            if(getLastBlock() == nullptr || getLastBlock()->selector != selector){
+                Block block(selector);
+                blocks.pushBack(block);
             }
         }
     }
@@ -85,11 +85,21 @@ void CssParser::addToBlock(String &line) {
         removeUselessWhitespace(attribute[1]);
         a.name = attribute[0];
         a.value = attribute[1];
-        if(blockOpen)
-            currentBlock->addAttribute(a);
-        else
-            globalBlock.addAttribute(a);
+        getLastBlock()->addAttribute(a);
     }
+}
+
+Block *CssParser::getLastBlock() {
+    typedef List<Block>::Node blockNode;
+    blockNode *node = blocks.last;
+    Block *block = nullptr;
+    if(node == nullptr)
+        return block;
+    for(auto & element : node->elements){
+        if(!element.free)
+            block = &element.value;
+    }
+    return block;
 }
 
 Block* CssParser::getBlock(String &selector) {
@@ -113,7 +123,7 @@ void CssParser::removeUselessWhitespace(String &line) {
         line.remove(line.size()-1);
 }
 
-Block::Block(String &selector) {
+Block::Block(String &selector) : global(false) {
     this->selector = selector;
     List<String> selectors = selector.split(',');
     for(int i = 0; i < selectors.size(); i++)
@@ -121,7 +131,7 @@ Block::Block(String &selector) {
     this->selectors = selectors;
 }
 
-Block::Block() : selector(), selectors(), attributes() {}
+Block::Block() : selector(), selectors(), attributes(), global(true) {}
 
 void Block::addAttribute(Attribute &attribute) {
     typedef List<Attribute>::Node blockNode;
@@ -129,7 +139,7 @@ void Block::addAttribute(Attribute &attribute) {
     while(node != nullptr){
         for(auto & element : node->elements){
             if(!element.free && element.value.name == attribute.name) {
-                element.value.name = attribute.value;
+                element.value.value = attribute.value;
                 return;
             }
         }
