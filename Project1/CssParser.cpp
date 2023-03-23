@@ -59,6 +59,14 @@ void CssParser::parse(String &line) {
                 Block block(selector);
                 blocks.pushBack(block);
             }
+            if(parts.size() > 1){
+                String attributes = parts[1];
+                if(attributes.contains('}')) {
+                    blockOpen = false;
+                    attributes.remove('}');
+                }
+                addToBlock(attributes);
+            }
         }
     }
 }
@@ -86,6 +94,7 @@ void CssParser::addToBlock(String &line) {
         a.name = attribute[0];
         a.value = attribute[1];
         getLastBlock()->addAttribute(a);
+        int k = 2;
     }
 }
 
