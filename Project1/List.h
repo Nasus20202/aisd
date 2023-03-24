@@ -7,7 +7,7 @@ void swap(T& t1, T& t2){
     t2 = temp;
 }
 typedef unsigned short blockSize_t;      // integer type that is capable of storing blockSize
-template<typename T, blockSize_t blockSize = 8>
+template<typename T, blockSize_t blockSize = 4>
 class List {
 public:
     typedef unsigned long listSize_t;       // max amount of elements in the list
