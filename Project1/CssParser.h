@@ -11,7 +11,6 @@ struct Block {
     String selector;
     List<String> selectors;
     List<Attribute> attributes;
-    bool global;
     Block();
     Block(String& selector);
     void addAttribute(Attribute &attribute);

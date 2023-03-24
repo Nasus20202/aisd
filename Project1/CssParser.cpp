@@ -2,8 +2,6 @@
 #include <iostream>
 using namespace std;
 
-int counter = 100;
-
 void CssParser::loadLine(String &line) {
     removeUselessWhitespace(line);
     if(line.length() == 0) // check if empty
@@ -305,7 +303,7 @@ void CssParser::removeUselessWhitespace(String &line) {
         line.remove(line.size()-1);
 }
 
-Block::Block(String &selector) : global(false) {
+Block::Block(String &selector) {
     this->selector = selector;
     List<String> selectorsSplit = selector.split(',');
     for(int i = 0; i < selectorsSplit.size(); i++)
@@ -313,7 +311,7 @@ Block::Block(String &selector) : global(false) {
     this->selectors = selectorsSplit;
 }
 
-Block::Block() : selector(), selectors(), attributes(), global(true) {}
+Block::Block() : selector(), selectors(), attributes(){}
 
 void Block::addAttribute(Attribute &attribute) {
     attributeNode* node = attributes.first;
