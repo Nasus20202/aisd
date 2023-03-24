@@ -21,6 +21,9 @@ void CssParser::loadLine(String &line) {
 }
 
 void CssParser::parse(String &line) {
+    /*if(blocks.size() == 211){
+        cout << "!!!   " <<line << endl;
+    }*/
     String currentInput;
     for(int i = 0; i < line.size(); i++){
         char c = line[i];
@@ -35,7 +38,7 @@ void CssParser::parse(String &line) {
             }
             // else use current input as block selector, then empty current input
             else {
-                Block block(currentInput);
+                Block block(previous+currentInput);
                 blocks.pushBack(block);
                 currentInput.empty();
             }
@@ -79,6 +82,7 @@ void CssParser::query(String &query) {
             if(id-1 < blocks.size()) {
                 cout << query << " == " << blocks[id - 1].selectors.size() << endl;
             }
+
         }
         // i,A,?
         else if(isFirstInt && second == 'A' && third[0] == '?') {
