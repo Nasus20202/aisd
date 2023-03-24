@@ -9,5 +9,4 @@ int main() {
         cin >> s;
         parser.loadLine(s);
     }
-    int a = 2;
 }
