@@ -32,79 +32,68 @@ void CssParser::query(String &query) {
         String third = commands[2];
         bool isFirstInt = first.isInt(), isThirdInt = third.isInt();
 
-        bool done = false;
         // i,S,?
-        if(!done && isFirstInt && second == 'S' && third[0] == '?'){
+        if(isFirstInt && second == 'S' && third[0] == '?'){
             int id = commands[0].toInt();
             if(id-1 < blocks.size()) {
-                cout << query << " == " << blocks[id - 1].selectors.size() << endl; done = true;
+                cout << query << " == " << blocks[id - 1].selectors.size() << endl;
             }
         }
         // i,A,?
-        if(!done && isFirstInt && second == 'A' && third[0] == '?') {
+        else if(isFirstInt && second == 'A' && third[0] == '?') {
             int id = commands[0].toInt();
             if(id-1 < blocks.size()) {
-                cout << query << " == " << blocks[id - 1].attributes.size() << endl; done = true;
+                cout << query << " == " << blocks[id - 1].attributes.size() << endl;
             }
         }
         // i,S,j
-        if(!done && isFirstInt && second == 'S' && isThirdInt){
+        else if(isFirstInt && second == 'S' && isThirdInt){
             int blockId = first.toInt(), selectorId = third.toInt();
             if(blockId-1 < blocks.size()) {
                 Block block = blocks[blockId - 1];
                 if (selectorId - 1 < block.selectors.size()) {
-                    cout << query << " == " << block.selectors[selectorId - 1] << endl; done = true;
+                    cout << query << " == " << block.selectors[selectorId - 1] << endl;
                 }
             }
         }
         // i,A,n
-        if(!done && isFirstInt && second == 'A'){
+        else if(isFirstInt && second == 'A'){
             int blockId = first.toInt();
             if(blockId-1 < blocks.size()) {
                 Block block = blocks[blockId - 1];
                 Attribute *attribute = block.getAttributeByName(third);
                 if (attribute != nullptr) {
-                    cout << query << " == " << attribute->value << endl; done = true;
+                    cout << query << " == " << attribute->value << endl;
                 }
             }
         }
         // n,A,?
-        if(!done && second == 'A' && third[0] == '?'){
-            int count = countAttribute(first);
-            if(count != 0) {
-                cout << query << " == " << count << endl;
-                done = true;
-            }
+        else if(second == 'A' && third[0] == '?'){
+            cout << query << " == " << countAttribute(first) << endl;
         }
         // z,S,?
-        if(!done && second == 'S' && third[0] == '?'){
-            int count = countSelector(first);
-            if(count != 0) {
-                cout << query << " == " << count << endl;
-                done = true;
-            }
+        else if(second == 'S' && third[0] == '?'){
+            cout << query << " == " << countSelector(first) << endl;
         }
         // z,E,n
-        if(!done && second == 'E'){
+        else if(second == 'E'){
             Attribute* attribute = getAttributeForSelector(first, third);
             if(attribute != nullptr) {
-                cout << query << " == " << attribute->value << endl; done = true;
+                cout << query << " == " << attribute->value << endl;
             }
         }
         // i,D,*
-        if(!done && isFirstInt && second == 'D' && third[0] == '*'){
+        else if(isFirstInt && second == 'D' && third[0] == '*'){
             int blockId = first.toInt();
             if(deleteBlock(blockId-1)) {
                 cout << query << " == deleted" << endl;
-                done = true;
             }
         }
         // i,D,n
-        if (!done && isFirstInt && second == 'D'){
+        else if (isFirstInt && second == 'D'){
             int blockId = first.toInt();
             if(deleteAttribute(blockId-1, third)) {
                 cout << query << " == deleted" << endl;
-                done = true;
             }
         }
     }

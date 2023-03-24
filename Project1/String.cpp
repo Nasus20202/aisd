@@ -124,9 +124,9 @@ void String::remove(int index) {
 void String::empty() {
     if(characters != nullptr)
         delete[] characters;
-    characters = nullptr;
     allocated = 0;
     stringSize = 0;
+    characters = nullptr;
 }
 
 std::ostream &operator<<(std::ostream &os, String &s) {
