@@ -17,6 +17,8 @@ public:
     String& operator=(char array[]);
     String& operator+(char c);
     String& operator+=(char c);
+    String& operator+(String& s);
+    String& operator+=(String& s);
     bool operator==(String &other);
     bool operator==(char array[]);
     bool operator!=(String &other);

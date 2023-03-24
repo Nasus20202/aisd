@@ -3,9 +3,9 @@
 using namespace std;
 
 void CssParser::loadLine(String &line) {
-    if(line.length() == 0)
-        return;
     removeUselessWhitespace(line);
+    if(line.length() == 0) // check if empty
+        return;
     if(line == (char*) "????"){
         parsing = false;
     }
@@ -19,6 +19,47 @@ void CssParser::loadLine(String &line) {
         parse(line);
     }
 }
+
+void CssParser::parse(String &line) {
+    String currentInput;
+    for(int i = 0; i < line.size(); i++){
+        char c = line[i];
+        // open a new block if c == {
+        if(c == '{'){
+            blockOpen = true;
+            // if { is the first character, use previous line as block selector, then empty previous
+            if(i == 0){
+                Block block(previous);
+                blocks.pushBack(block);
+                previous.empty();
+            }
+            // else use current input as block selector, then empty current input
+            else {
+                Block block(currentInput);
+                blocks.pushBack(block);
+                currentInput.empty();
+            }
+        }
+        // close the block if c == }, add to current block, then empty current input
+        else if(c == '}'){
+            blockOpen = false;
+            addToBlock(currentInput);
+            currentInput.empty();
+        }
+        // add c to current input
+        else{
+            currentInput+=c;
+        }
+    }
+    if(blockOpen) {
+        addToBlock(currentInput);
+    }
+    if(isGlobalAttribute(currentInput))
+        previous.empty();
+    else
+        previous += currentInput;
+}
+
 
 void CssParser::query(String &query) {
     if(query == (char*) "?"){
@@ -202,46 +243,6 @@ unsigned int CssParser::countSelector(String &name) {
     return count;
 }
 
-void CssParser::parse(String &line) {
-    if(blockOpen){
-        if(line.contains('}')){
-            blockOpen = false;
-            line.remove('}');
-        }
-        List<String> parts = line.split('}');
-        if(parts.size() > 0)
-            addToBlock(parts[0]);
-    } else {
-        if(isGlobalAttribute(line)){
-            if(getLastBlock() == nullptr || !getLastBlock()->global){
-                Block block;
-                blocks.pushBack(block);
-            }
-            addToBlock(line);
-        } else {
-            if(line.contains('{'))
-                blockOpen = true;
-            List<String> parts = line.split('{');
-            if(parts.size() == 0)
-                return;
-            String selector = parts[0];
-            removeUselessWhitespace(selector);
-            if(getLastBlock() == nullptr || getLastBlock()->selector != selector){
-                Block block(selector);
-                blocks.pushBack(block);
-            }
-            if(parts.size() > 1){
-                String attributes = parts[1];
-                if(attributes.contains('}')) {
-                    blockOpen = false;
-                    attributes.remove('}');
-                }
-                addToBlock(attributes);
-            }
-        }
-    }
-}
-
 bool CssParser::isGlobalAttribute(String &line) {
     if(!line.contains(':'))
         return false;
@@ -256,6 +257,8 @@ bool CssParser::isGlobalAttribute(String &line) {
 }
 
 void CssParser::addToBlock(String &line) {
+    if(line.size() == 0)
+        return;
     List<String> attributes = line.split(';');
     for(int i = 0; i < attributes.size(); i++){
         List<String> attribute = attributes[i].split(':');

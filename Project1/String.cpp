@@ -229,3 +229,15 @@ bool String::operator!=(char *array) {
     return !(*this == array);
 }
 
+String &String::operator+(String &s) {
+    String *temp = new String(*this);
+    *temp += s;
+    return *temp;
+}
+
+String &String::operator+=(String &s) {
+    for(int i = 0; i < s.stringSize; i++)
+        add(s[i]);
+    return *this;
+}
+

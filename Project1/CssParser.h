@@ -22,6 +22,7 @@ class CssParser {
 protected:
     typedef List<Block>::Node blockNode;
     List<Block> blocks;
+    String previous;
     bool blockOpen = false;
     bool parsing = true;
 public:
