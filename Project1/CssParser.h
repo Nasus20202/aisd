@@ -23,13 +23,7 @@ protected:
     String previous;
     bool blockOpen = false;
     bool parsing = true;
-public:
     List<Block> blocks;
-    void loadLine(String& line);
-    void query(String &query);
-    void parse(String &line);
-    bool isGlobalAttribute(String &line);
-    static void removeUselessWhitespace(String &line);
     void addToBlock(String& line);
     Block *getLastBlock();
     unsigned int countAttribute(String &name);
@@ -37,4 +31,10 @@ public:
     Attribute* getAttributeForSelector(String &selector, String &attribute);
     bool deleteBlock(int blockId);
     bool deleteAttribute(int blockId, String& attributeName);
+    bool isGlobalAttribute(String &line);
+public:
+    void loadLine(String& line);
+    void query(String &query);
+    void parse(String &line);
+    static void removeUselessWhitespace(String &line);
 };
