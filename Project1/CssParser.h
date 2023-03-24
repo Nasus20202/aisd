@@ -21,11 +21,11 @@ struct Block {
 class CssParser {
 protected:
     typedef List<Block>::Node blockNode;
-    List<Block> blocks;
     String previous;
     bool blockOpen = false;
     bool parsing = true;
 public:
+    List<Block> blocks;
     void loadLine(String& line);
     void query(String &query);
     void parse(String &line);

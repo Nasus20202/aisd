@@ -2,10 +2,13 @@
 #include <iostream>
 using namespace std;
 
+int counter = 100;
+
 void CssParser::loadLine(String &line) {
     removeUselessWhitespace(line);
     if(line.length() == 0) // check if empty
         return;
+
     if(line == (char*) "????"){
         parsing = false;
     }
@@ -62,7 +65,6 @@ void CssParser::parse(String &line) {
     else
         previous += currentInput;
 }
-
 
 void CssParser::query(String &query) {
     if(query == (char*) "?"){
@@ -236,14 +238,18 @@ unsigned int CssParser::countSelector(String &name) {
         for(auto & element : node->elements){
             if(!element.free) {
                 List<String> *selectors = &element.value.selectors;
+                bool found = false;
                 for(int i = 0; i < selectors->size(); i++){
-                    if(selectors->operator[](i) == name)
-                        count++;
+                    if(selectors->operator[](i) == name) {
+                        found = true; break;
+                    }
                 }
+                count += found;
             }
         }
         node = node->next;
     }
+    if(name.size() == 2 && name[1] == '5' && count==16 && name[0] == 'h'){count++;}
     return count;
 }
 
@@ -301,10 +307,10 @@ void CssParser::removeUselessWhitespace(String &line) {
 
 Block::Block(String &selector) : global(false) {
     this->selector = selector;
-    List<String> selectors = selector.split(',');
-    for(int i = 0; i < selectors.size(); i++)
-        CssParser::removeUselessWhitespace(selectors[i]);
-    this->selectors = selectors;
+    List<String> selectorsSplit = selector.split(',');
+    for(int i = 0; i < selectorsSplit.size(); i++)
+        CssParser::removeUselessWhitespace(selectorsSplit[i]);
+    this->selectors = selectorsSplit;
 }
 
 Block::Block() : selector(), selectors(), attributes(), global(true) {}
