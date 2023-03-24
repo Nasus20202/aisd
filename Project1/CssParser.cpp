@@ -25,81 +25,129 @@ void CssParser::query(String &query) {
         cout << query << " == " << blocks.size() << endl;
     } else {
         List<String> commands = query.split(',');
+        if(commands.size() < 3)
+            return;
         String first = commands[0];
         char second = commands[1][0];
         String third = commands[2];
         bool isFirstInt = first.isInt(), isThirdInt = third.isInt();
 
-
+        bool done = false;
         // i,S,?
-        if(isFirstInt && second == 'S' && third[0] == '?'){
+        if(!done && isFirstInt && second == 'S' && third[0] == '?'){
             int id = commands[0].toInt();
-            if(id-1 >= blocks.size())
-                return;
-            cout << query << " == " << blocks[id-1].selectors.size() << endl;
+            if(id-1 < blocks.size()) {
+                cout << query << " == " << blocks[id - 1].selectors.size() << endl; done = true;
+            }
         }
         // i,A,?
-        else if(isFirstInt && second == 'A' && third[0] == '?') {
+        if(!done && isFirstInt && second == 'A' && third[0] == '?') {
             int id = commands[0].toInt();
-            if(id-1 >= blocks.size())
-                return;
-            cout << query << " == " << blocks[id-1].attributes.size() << endl;
+            if(id-1 < blocks.size()) {
+                cout << query << " == " << blocks[id - 1].attributes.size() << endl; done = true;
+            }
         }
         // i,S,j
-        else if(isFirstInt && second == 'S' && isThirdInt){
+        if(!done && isFirstInt && second == 'S' && isThirdInt){
             int blockId = first.toInt(), selectorId = third.toInt();
-            if(blockId-1 >= blocks.size())
-                return;
-            Block block = blocks[blockId-1];
-            if(selectorId-1 >= block.selectors.size())
-                return;
-            cout << query << " == " << block.selectors[selectorId-1] << endl;
+            if(blockId-1 < blocks.size()) {
+                Block block = blocks[blockId - 1];
+                if (selectorId - 1 < block.selectors.size()) {
+                    cout << query << " == " << block.selectors[selectorId - 1] << endl; done = true;
+                }
+            }
         }
         // i,A,n
-        else if(isFirstInt && second == 'A'){
+        if(!done && isFirstInt && second == 'A'){
             int blockId = first.toInt();
-            if(blockId-1 >= blocks.size())
-                return;
-            Block block = blocks[blockId-1];
-            Attribute *attribute = block.getAttributeByName(third);
-            if(attribute == nullptr)
-                return;
-            cout << query << " == " << attribute->value << endl;
+            if(blockId-1 < blocks.size()) {
+                Block block = blocks[blockId - 1];
+                Attribute *attribute = block.getAttributeByName(third);
+                if (attribute != nullptr) {
+                    cout << query << " == " << attribute->value << endl; done = true;
+                }
+            }
         }
         // n,A,?
-        else if(second == 'A' && third[0] == '?'){
-            cout << query << " == " << countAttribute(first) << endl;
+        if(!done && second == 'A' && third[0] == '?'){
+            int count = countAttribute(first);
+            if(count != 0) {
+                cout << query << " == " << count << endl;
+                done = true;
+            }
         }
         // z,S,?
-        else if(second == 'S' && third[0] == '?'){
-            cout << query << " == " << countSelector(first) << endl;
+        if(!done && second == 'S' && third[0] == '?'){
+            int count = countSelector(first);
+            if(count != 0) {
+                cout << query << " == " << count << endl;
+                done = true;
+            }
         }
         // z,E,n
-        else if(second == 'E'){
+        if(!done && second == 'E'){
             Attribute* attribute = getAttributeForSelector(first, third);
-            if(attribute == nullptr)
-                return;
-            cout << query << " == " << attribute->value << endl;
+            if(attribute != nullptr) {
+                cout << query << " == " << attribute->value << endl; done = true;
+            }
         }
         // i,D,*
-        else if(isFirstInt && second == 'D' && third[0] == '*'){
-
+        if(!done && isFirstInt && second == 'D' && third[0] == '*'){
+            int blockId = first.toInt();
+            if(deleteBlock(blockId-1)) {
+                cout << query << " == deleted" << endl;
+                done = true;
+            }
         }
         // i,D,n
-        else if (isFirstInt && second == 'D'){
-
-        }
-        else {
-            cout << "Not found: " << query;
-            throw;
+        if (!done && isFirstInt && second == 'D'){
+            int blockId = first.toInt();
+            if(deleteAttribute(blockId-1, third)) {
+                cout << query << " == deleted" << endl;
+                done = true;
+            }
         }
     }
+}
+
+bool CssParser::deleteBlock(int blockId) {
+    if(blockId >= blocks.size())
+        return false;
+    blocks.remove(blockId);
+    return true;
+}
+
+bool CssParser::deleteAttribute(int blockId, String &attributeName) {
+    if(blockId >= blocks.size())
+        return false;
+    Block* block = &blocks[blockId];
+    Block::attributeNode *attributeNode = block->attributes.first; bool done = false;
+    while(attributeNode != nullptr){
+        int id = 0;
+        for(auto element : attributeNode->elements) {
+            if (!element.free) {
+                if (element.value.name == attributeName) {
+                    block->attributes.remove(id);
+                    done = true;
+                    break;
+                }
+                id++;
+            }
+        } if(done)
+            break;
+        attributeNode = attributeNode->next;
+    }
+    if(block->attributes.size() == 0){
+        blocks.remove(blockId);
+    }
+    return done;
 }
 
 Attribute* CssParser::getAttributeForSelector(String &selector, String &attribute) {
     blockNode* blockNode = blocks.first;
     Attribute* result = nullptr;
     while(blockNode != nullptr){
+        blockNode::Element *element;
         for(auto & blockElement : blockNode->elements){
             if(!blockElement.free){
                 bool containsSelector = false;
@@ -222,13 +270,14 @@ void CssParser::addToBlock(String &line) {
     List<String> attributes = line.split(';');
     for(int i = 0; i < attributes.size(); i++){
         List<String> attribute = attributes[i].split(':');
+        if(attribute.size() == 1)
+            attribute.pushBack(String((char *) ""));
         Attribute a;
         removeUselessWhitespace(attribute[0]);
         removeUselessWhitespace(attribute[1]);
         a.name = attribute[0];
         a.value = attribute[1];
         getLastBlock()->addAttribute(a);
-        int k = 2;
     }
 }
 
@@ -244,24 +293,13 @@ Block *CssParser::getLastBlock() {
     return block;
 }
 
-Block* CssParser::getBlock(String &selector) {
-    blockNode* node = blocks.first;
-    Block* result = nullptr;
-    while(node != nullptr){
-        for(auto & element : node->elements){
-            if(!element.free && element.value.selector == selector)
-                result = &element.value;
-        }
-        node = node->next;
-    }
-    return result;
-}
-
-
 void CssParser::removeUselessWhitespace(String &line) {
-    while(line[0] == '\t' || line[0] == ' ')
-        line.remove((String::stringSize_t)0);
-    while(line[line.size()-1] == ' ' || line[line.size()-1] == '\t')
+    if(line.size() == 0)
+        return;
+    while(line.size() > 0 && (line[0] == '\t' || line[0] == ' '))
+        line.remove(0);
+
+    while(line.size() > 0 && (line[line.size()-1] == ' ' || line[line.size()-1] == '\t'))
         line.remove(line.size()-1);
 }
 

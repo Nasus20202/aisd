@@ -31,9 +31,10 @@ public:
     bool isGlobalAttribute(String &line);
     static void removeUselessWhitespace(String &line);
     void addToBlock(String& line);
-    Block *getBlock(String& selector); // returns nullptr if not found
     Block *getLastBlock();
     unsigned int countAttribute(String &name);
     unsigned int countSelector(String &name);
     Attribute* getAttributeForSelector(String &selector, String &attribute);
+    bool deleteBlock(int blockId);
+    bool deleteAttribute(int blockId, String& attributeName);
 };

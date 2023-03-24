@@ -3,23 +3,18 @@
 #include <istream>
 
 class String {
-public:
-    typedef List<char>::listSize_t stringSize_t;
 protected:
-    static const blockSize_t blockSize = 64;
-    typedef List<char, blockSize> charList;
-    charList characters;
+    char* characters = nullptr;
+    unsigned int stringSize = 0;
+    unsigned int allocated = 0;
 public:
     String();
+    ~String();
     String(char array[]);
     String(String &other);
-    char& operator[](charList::listSize_t index);
+    char& operator[](int index);
     String& operator=(String &other);
     String& operator=(char array[]);
-    String& operator+(String &other);
-    String& operator+=(String &other);
-    String& operator+(char array[]);
-    String& operator+=(char array[]);
     String& operator+(char c);
     String& operator+=(char c);
     bool operator==(String &other);
@@ -27,19 +22,17 @@ public:
     bool operator!=(String &other);
     bool operator!=(char array[]);
     List<String>& split(char c);
-    List<String>& split(String &other);
-    stringSize_t length() const;
-    stringSize_t size() const;
-    stringSize_t getSize() const;
-    bool contains(String &other);
-    bool contains(char* array);
+    int length() const;
+    int size() const;
+    int getSize() const;
     bool contains(char c);
     void remove(char c);
-    void remove(stringSize_t index);
-    void remove(String &other);
+    void remove(int index);
     void empty();
     int toInt();
     bool isInt();
+    int count(char c);
+    void add(char c);
 protected:
     friend std::ostream& operator<<(std::ostream &os, String& s);
     friend std::istream& operator>>(std::istream &is, String& s);
