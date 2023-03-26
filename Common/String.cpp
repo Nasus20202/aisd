@@ -43,10 +43,10 @@ String &String::operator=(char *array) {
     return *this;
 }
 
-String &String::operator+(char c) {
-    String *s = new String(*this);
-    *s += c;
-    return *s;
+String String::operator+(char c) {
+    String s(*this);
+    s += c;
+    return s;
 }
 
 String &String::operator+=(char c) {
@@ -79,14 +79,14 @@ bool String::operator==(char *array) {
 }
 
 
-List<String>& String::split(char c) {
-    List<String> *list = new List<String>();
+List<String> String::split(char c) {
+    List<String> list;
     String s; char currentChar;
     for(int i = 0; i < length(); i++){
         currentChar = characters[i];
         if(currentChar == c){
             if(s.length() > 0)
-                list->pushBack(s);
+                list.pushBack(s);
             s.empty();
         }
         else {
@@ -94,8 +94,8 @@ List<String>& String::split(char c) {
         }
     }
     if(s.length()>0)
-        list->pushBack(s);
-    return *list;
+        list.pushBack(s);
+    return list;
 }
 
 void String::remove(char c) {
@@ -229,10 +229,10 @@ bool String::operator!=(char *array) {
     return !(*this == array);
 }
 
-String &String::operator+(String &s) {
-    String *temp = new String(*this);
-    *temp += s;
-    return *temp;
+String String::operator+(String &s) {
+    String temp(*this);
+    temp += s;
+    return temp;
 }
 
 String &String::operator+=(String &s) {

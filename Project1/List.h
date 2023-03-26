@@ -35,7 +35,7 @@ public:
     void pushBack (T &&element);
     T& operator[](listSize_t index);
     List<T, blockSize>& operator=(List &other);
-    List<T, blockSize>& operator+(List &other);
+    List<T, blockSize> operator+(List &other);
     List<T, blockSize>& operator+=(List &other);
     bool operator==(List &other);
     listSize_t getSize() const;
@@ -96,11 +96,10 @@ List<T, blockSize> &List<T, blockSize>::operator+=(List &other) {
 }
 
 template<typename T, blockSize_t blockSize>
-List<T, blockSize> &List<T, blockSize>::operator+(List &other) {
-    List<T, blockSize> *temp = new List<T, blockSize>();
-    *temp += *this;
-    *temp += other;
-    return *temp;
+List<T, blockSize> List<T, blockSize>::operator+(List &other) {
+    List<T, blockSize> temp(*this);
+    temp += other;
+    return temp;
 }
 
 template<typename T, blockSize_t blockSize>

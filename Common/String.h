@@ -15,15 +15,15 @@ public:
     char& operator[](int index);
     String& operator=(String &other);
     String& operator=(char array[]);
-    String& operator+(char c);
+    String operator+(char c);
     String& operator+=(char c);
-    String& operator+(String& s);
+    String operator+(String& s);
     String& operator+=(String& s);
     bool operator==(String &other);
     bool operator==(char array[]);
     bool operator!=(String &other);
     bool operator!=(char array[]);
-    List<String>& split(char c);
+    List<String> split(char c);
     int length() const;
     int size() const;
     int getSize() const;

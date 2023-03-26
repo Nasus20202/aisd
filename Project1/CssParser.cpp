@@ -36,7 +36,8 @@ void CssParser::parse(String &line) {
             }
             // else use current input as block selector, then empty current input
             else {
-                Block block(previous+currentInput);
+                String selector = previous+currentInput;
+                Block block(selector);
                 blocks.pushBack(block);
                 currentInput.empty();
             }

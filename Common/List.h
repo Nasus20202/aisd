@@ -1,5 +1,4 @@
 #pragma once
-#include <initializer_list>
 
 template<typename T>
 void swap(T& t1, T& t2){
@@ -8,7 +7,7 @@ void swap(T& t1, T& t2){
     t2 = temp;
 }
 typedef unsigned short blockSize_t;      // integer type that is capable of storing blockSize
-template<typename T, blockSize_t blockSize = 8>
+template<typename T, blockSize_t blockSize = 4>
 class List {
 public:
     typedef unsigned long listSize_t;       // max amount of elements in the list
@@ -32,12 +31,11 @@ public:
     List();
     ~List();
     List(List &other);
-    List(std::initializer_list<T> list);
     void pushBack (T &element);
     void pushBack (T &&element);
     T& operator[](listSize_t index);
     List<T, blockSize>& operator=(List &other);
-    List<T, blockSize>& operator+(List &other);
+    List<T, blockSize> operator+(List &other);
     List<T, blockSize>& operator+=(List &other);
     bool operator==(List &other);
     listSize_t getSize() const;
@@ -51,6 +49,8 @@ protected:
     typename Node::Element* getElementFromNode(Node* node, listSize_t n, listSize_t &current);
     Node* getNodeOfElement(listSize_t n);
     Node* getNodeOfElement(listSize_t n, listSize_t &current);
+    friend class CssParser;
+    friend class Block;
 };
 
 
@@ -96,11 +96,10 @@ List<T, blockSize> &List<T, blockSize>::operator+=(List &other) {
 }
 
 template<typename T, blockSize_t blockSize>
-List<T, blockSize> &List<T, blockSize>::operator+(List &other) {
-    List<T, blockSize> *temp = new List<T, blockSize>();
-    *temp += *this;
-    *temp += other;
-    return *temp;
+List<T, blockSize> List<T, blockSize>::operator+(List &other) {
+    List<T, blockSize> temp(*this);
+    temp += other;
+    return temp;
 }
 
 template<typename T, blockSize_t blockSize>
@@ -111,13 +110,6 @@ List<T, blockSize>::List(List &other) : first(nullptr), last(nullptr), _size(0){
     for(int i = 0; i < other.getSize(); i++){
         pushBack(other[i]);
     }
-}
-
-
-template<typename T, blockSize_t blockSize>
-List<T, blockSize>::List(std::initializer_list<T> list) {
-    for(T elem : list)
-        pushBack(elem);
 }
 
 template<typename T, blockSize_t blockSize>
