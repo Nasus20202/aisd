@@ -25,6 +25,8 @@ void CssParser::parse(String &line) {
     String currentInput;
     for(int i = 0; i < line.size(); i++){
         char c = line[i];
+        if(c<' ')
+            continue;
         // open a new block if c == {
         if(c == '{'){
             blockOpen = true;
@@ -245,7 +247,6 @@ unsigned int CssParser::countSelector(String &name) {
         }
         node = node->next;
     }
-    if(name.size() == 2 && name[1] == '5' && count==16 && name[0] == 'h'){count++;}
     return count;
 }
 
