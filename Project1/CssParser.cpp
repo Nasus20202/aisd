@@ -213,7 +213,7 @@ Attribute* CssParser::getAttributeForSelector(String &selector, String &attribut
     return result;
 }
 
-unsigned int CssParser::countAttribute(String &name) {
+int CssParser::countAttribute(String &name) const{
     unsigned int count = 0;
     blockNode* node = blocks.first;
     while(node != nullptr){
@@ -229,7 +229,7 @@ unsigned int CssParser::countAttribute(String &name) {
     return count;
 }
 
-unsigned int CssParser::countSelector(String &name) {
+int CssParser::countSelector(String &name) const{
     unsigned int  count = 0;
     blockNode* node = blocks.first;
     while(node != nullptr){
@@ -302,8 +302,7 @@ void CssParser::removeUselessWhitespace(String &line) {
         line.remove(line.size()-1);
 }
 
-Block::Block(String &selector) {
-    this->selector = selector;
+Block::Block(String &selector) : selector(selector) {
     List<String> selectorsSplit = selector.split(',');
     for(int i = 0; i < selectorsSplit.size(); i++)
         CssParser::removeUselessWhitespace(selectorsSplit[i]);

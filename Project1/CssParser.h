@@ -26,12 +26,12 @@ protected:
     List<Block> blocks;
     void addToBlock(String& line);
     Block *getLastBlock();
-    unsigned int countAttribute(String &name);
-    unsigned int countSelector(String &name);
+    int countAttribute(String &name) const;
+    int countSelector(String &name) const;
     Attribute* getAttributeForSelector(String &selector, String &attribute);
     bool deleteBlock(int blockId);
     bool deleteAttribute(int blockId, String& attributeName);
-    bool isGlobalAttribute(String &line);
+    static bool isGlobalAttribute(String &line);
 public:
     void loadLine(String& line);
     void query(String &query);

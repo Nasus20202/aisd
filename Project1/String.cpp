@@ -54,7 +54,7 @@ String &String::operator+=(char c) {
     return *this;
 }
 
-bool String::operator==(String &other) {
+bool String::operator==(String &other) const{
     if(this->stringSize != other.stringSize)
         return false;
     for(int i = 0; i < stringSize; i++)
@@ -63,7 +63,7 @@ bool String::operator==(String &other) {
     return true;
 }
 
-bool String::operator==(char *array) {
+bool String::operator==(char *array) const{
     int size = 0;
     while(*array != '\0'){
         if(size >= stringSize)
@@ -79,11 +79,11 @@ bool String::operator==(char *array) {
 }
 
 
-List<String> String::split(char c) {
+List<String> String::split(char c) const{
     List<String> list;
-    String s; char currentChar;
+    String s;
     for(int i = 0; i < length(); i++){
-        currentChar = characters[i];
+        char currentChar = characters[i];
         if(currentChar == c){
             if(s.length() > 0)
                 list.pushBack(s);
@@ -138,9 +138,9 @@ std::ostream &operator<<(std::ostream &os, String &s) {
 
 std::istream &operator>>(std::istream &is, String &s) {
     s.empty();
-    char c; bool done = false;
+    bool done = false;
     while(!done) {
-        c = is.get();
+        char c = is.get();
         if(is.eof())
             break;
         if (c == '\0' || c == '\n')
@@ -181,36 +181,42 @@ int String::length() const {
 }
 
 
-bool String::contains(char c) {
+bool String::contains(char c) const{
     for(int i = 0; i < size(); i++){
-        if((*this)[i] == c)
+        if(characters[i] == c)
             return true;
     }
     return false;
 }
 
-int String::toInt() {
+int String::toInt() const{
     int result = 0;
     for(int i = 0; i < size(); i++){
+        if(characters[i] == '-')
+            continue;
         result *= 10;
         result += characters[i] - '0';
     }
+    if(characters[0] == '-')
+        result*=-1;
     return result;
 }
 
-bool String::isInt() {
+bool String::isInt() const{
     for(int i = 0; i < size(); i++){
         char c = characters[i];
+        if(i == 0 && c == '-')
+            continue;
         if(c < '0' || c > '9')
             return false;
     }
     return true;
 }
 
-int String::count(char c) {
+int String::count(char c) const{
     int count = 0;
     for(int i = 0; i < size(); i++){
-        char cs = (*this)[i];
+        char cs = characters[i];
         if(c  == cs)
             count++;
     }
@@ -221,11 +227,11 @@ String::~String() {
     empty();
 }
 
-bool String::operator!=(String &other) {
+bool String::operator!=(String &other) const{
     return !(*this == other);
 }
 
-bool String::operator!=(char *array) {
+bool String::operator!=(char *array) const{
     return !(*this == array);
 }
 

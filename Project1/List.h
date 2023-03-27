@@ -37,7 +37,7 @@ public:
     List<T, blockSize>& operator=(List &other);
     List<T, blockSize> operator+(List &other);
     List<T, blockSize>& operator+=(List &other);
-    bool operator==(List &other);
+    bool operator==(List &other) const;
     listSize_t getSize() const;
     listSize_t length() const;
     listSize_t size() const;
@@ -56,9 +56,9 @@ protected:
 
 template<typename T, blockSize_t blockSize>
 void List<T, blockSize>::empty() {
-    Node *node = first, *copy;
+    Node *node = first;
     while(node != nullptr){
-        copy = node;
+        Node *copy = node;
         node = node->next;
         delete copy;
     }
@@ -67,7 +67,7 @@ void List<T, blockSize>::empty() {
 }
 
 template<typename T, blockSize_t blockSize>
-bool List<T, blockSize>::operator==(List &other) {
+bool List<T, blockSize>::operator==(List &other) const{
     if(this == &other)
         return true;
     if(_size != other.getSize())
