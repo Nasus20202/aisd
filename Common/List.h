@@ -42,7 +42,7 @@ public:
     listSize_t length() const;
     listSize_t size() const;
     void remove(listSize_t index);
-    void remove(T &element);
+    void remove(T &search);
     void empty();
 protected:
     typename Node::Element* getElement(listSize_t n);
@@ -83,13 +83,17 @@ template<typename T, blockSize_t blockSize>
 List<T, blockSize> &List<T, blockSize>::operator+=(List &other) {
     if(this == &other){
         List<T, blockSize> newList = *this;
-        for(int i = 0; i < other.getSize(); i++){
-            newList.pushBack(other[i]);
-        }
+        newList += other;
         *this = newList;
     } else {
-        for (int i = 0; i < other.getSize(); i++) {
-            pushBack(other[i]);
+        Node *node = other.first;
+        while(node != nullptr){
+            for(auto element : node->elements){
+                if(!element.free){
+                    pushBack(element.value);
+                }
+            }
+            node = node->next;
         }
     }
     return *this;
@@ -107,8 +111,14 @@ List<T, blockSize>::List() {}
 
 template<typename T, blockSize_t blockSize>
 List<T, blockSize>::List(List &other) : first(nullptr), last(nullptr), _size(0){
-    for(int i = 0; i < other.getSize(); i++){
-        pushBack(other[i]);
+    Node *node = other.first;
+    while(node != nullptr){
+        for(auto element : node->elements){
+            if(!element.free){
+                pushBack(element.value);
+            }
+        }
+        node = node->next;
     }
 }
 
@@ -199,12 +209,18 @@ void List<T, blockSize>::pushBack(T &&element) {
 
 
 template<typename T, blockSize_t blockSize>
-void List<T, blockSize>::remove(T &element) {
-    for(int i = 0; i < getSize(); i++){
-        if((*this)[i] == element){
-            remove(i);
-            i--;
+void List<T, blockSize>::remove(T &search) {
+    Node *node = first;
+    int id = 0;
+    while(node != nullptr){
+        for(auto element : node->elements){
+            if(!element.free){
+                if(element.value == search)
+                    remove(id);
+                id++;
+            }
         }
+        node = node->next;
     }
 }
 
