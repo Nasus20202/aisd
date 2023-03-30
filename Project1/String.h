@@ -10,19 +10,19 @@ protected:
 public:
     String();
     ~String();
-    String(char array[]);
+    String(const char array[]);
     String(String &other);
     char& operator[](int index);
     String& operator=(String &other);
-    String& operator=(char array[]);
+    String& operator=(const char array[]);
     String operator+(char c);
     String& operator+=(char c);
     String operator+(String& s);
     String& operator+=(String& s);
     bool operator==(String &other) const;
-    bool operator==(char array[]) const;
+    bool operator==(const char array[]) const;
     bool operator!=(String &other) const;
-    bool operator!=(char array[]) const;
+    bool operator!=(const char array[]) const;
     List<String> split(char c) const;
     int length() const;
     int size() const;

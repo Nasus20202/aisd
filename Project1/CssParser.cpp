@@ -7,10 +7,10 @@ void CssParser::loadLine(String &line) {
     if(line.length() == 0) // check if empty
         return;
 
-    if(line == (char*) "????"){
+    if(line == "????"){
         parsing = false;
     }
-    else if (line == (char*) "****") {
+    else if (line == "****") {
         parsing = true;
     }
     else if(!parsing){ // commands
@@ -65,7 +65,7 @@ void CssParser::parse(String &line) {
 }
 
 void CssParser::query(String &query) {
-    if(query == (char*) "?"){
+    if(query == "?"){
         cout << query << " == " << blocks.size() << endl;
     } else {
         List<String> commands = query.split(',');

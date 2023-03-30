@@ -2,7 +2,7 @@
 
 String::String() {}
 
-String::String(char *array) {
+String::String(const char *array) {
     while(*array != '\0'){
         add(*array);
         array++;
@@ -34,7 +34,7 @@ String &String::operator=(String &other) {
     return *this;
 }
 
-String &String::operator=(char *array) {
+String &String::operator=(const char *array) {
     empty();
     while(*array != '\0'){
         *this+=*array;
@@ -63,7 +63,7 @@ bool String::operator==(String &other) const{
     return true;
 }
 
-bool String::operator==(char *array) const{
+bool String::operator==(const char *array) const{
     int size = 0;
     while(*array != '\0'){
         if(size >= stringSize)
@@ -231,7 +231,7 @@ bool String::operator!=(String &other) const{
     return !(*this == other);
 }
 
-bool String::operator!=(char *array) const{
+bool String::operator!=(const char *array) const{
     return !(*this == array);
 }
 
