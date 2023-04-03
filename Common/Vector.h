@@ -165,6 +165,8 @@ Vector<T> &Vector<T>::operator=(Vector<T> &other) {
 
 template<typename T>
 T &Vector<T>::operator[](int index) {
+    if(index < 0 || index >= elementCount)
+        throw;
     return data[index];
 }
 
