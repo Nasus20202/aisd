@@ -1,7 +1,9 @@
 #include <iostream>
+#include "Map.h"
 using namespace std;
 
 int main() {
-    cout << "Hello, World!" << std::endl;
-    return 0;
+    int width, height; cin >> width >> height;
+    Map map(width, height);
+    map.readMap();
 }

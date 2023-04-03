@@ -3,4 +3,4 @@ project(Project2)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Project2 main.cpp String.cpp Vector.h List.h)
+add_executable(Project2 main.cpp String.cpp Vector.h List.h Map.cpp Map.h Queue.h)

@@ -9,6 +9,7 @@ protected:
     const int resizeFactor = 2;
 public:
     Vector();
+    Vector(int size);
     ~Vector();
     Vector(Vector<T> &other);
     Vector(std::initializer_list<T> list);
@@ -29,6 +30,11 @@ public:
     void empty();
     void resize(int newSize);
 };
+
+template<typename T>
+Vector<T>::Vector(int size) {
+    resize(size);
+}
 
 template<typename T>
 Vector<T>::Vector(std::initializer_list<T> list) {
