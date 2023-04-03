@@ -11,6 +11,7 @@ public:
     Vector();
     ~Vector();
     Vector(int size);
+    Vector(int size, T value);
     Vector(Vector<T> &other);
     Vector(std::initializer_list<T> list);
     T& operator[](int index);
@@ -32,6 +33,13 @@ public:
     void empty();
     void resize(int newSize);
 };
+
+template<typename T>
+Vector<T>::Vector(int size, T value) {
+    resize(size);
+    for(int i = 0; i < size; i++)
+        pushBack(value);
+}
 
 template<typename T>
 Vector<T>::Vector(int size) {

@@ -6,6 +6,7 @@ struct City {
     struct Connection {
         City *city;
         int distance;
+        Connection(City* city = nullptr, int distance = 0):city(city), distance(distance){};
     };
     Vector<Connection> connections;
     String name;
@@ -14,7 +15,7 @@ struct City {
 class Map {
 private:
     struct Tile {
-        char type; int x, y; bool visited = false;
+        int x, y; char type; City* city = nullptr;
         Tile(int x = 0, int y = 0,char type = Map::emptyTile) : type(type), x(x), y(y) {}
     };
     int width, height;
@@ -26,4 +27,6 @@ public:
     void readMap();
 private: // helpers
     void loadCities(Vector<Vector<Tile>>&);
+    void createCityGraph(Vector<Vector<Tile>>&);
+    Vector<Tile *> getCityTiles(Vector<Vector<Tile>>&);
 };
