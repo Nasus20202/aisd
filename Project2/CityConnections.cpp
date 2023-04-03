@@ -1,20 +1,12 @@
-#include "Map.h"
+#include "CityConnections.h"
 #include "Queue.h"
 #include <iostream>
 
-int min(int a, int b){
-    return a < b ? a : b;
-}
+CityConnections::CityConnections(int width, int height) : width(width), height(height) {}
 
-Map::Map(int width, int height) : width(width), height(height) {
+CityConnections::~CityConnections() {}
 
-}
-
-Map::~Map() {
-
-}
-
-void Map::readMap() {
+void CityConnections::readMap() {
     Vector<Vector<Tile>> tileMap(height,Vector<Tile>(width)); int cityCount = 0;
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
@@ -31,12 +23,6 @@ void Map::readMap() {
     loadCities(tileMap);
     createCityGraph(tileMap);
 
-
-    for(int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++)
-            std::cout << tileMap[i][j].type;
-        std::cout << std::endl;
-    }
     for(int i = 0; i < cities.length(); i++){
         std::cout << cities[i].name << " : " << std::endl;
         for(int j = 0; j < cities[i].connections.size(); j++){
@@ -46,7 +32,7 @@ void Map::readMap() {
     }
 }
 
-void Map::createCityGraph(Vector<Vector<Tile>> &tileMap) {
+void CityConnections::createCityGraph(Vector<Vector<Tile>> &tileMap) {
     Vector<Tile*> cityTiles = getCityTiles(tileMap);
     for(int i = 0; i < cityTiles.size(); i++){
         Tile* root = cityTiles[i];
@@ -85,7 +71,7 @@ void Map::createCityGraph(Vector<Vector<Tile>> &tileMap) {
 }
 
 
-void Map::loadCities(Vector<Vector<Tile>> &tileMap) {
+void CityConnections::loadCities(Vector<Vector<Tile>> &tileMap) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             Tile *tile = &tileMap[i][j];
@@ -129,8 +115,8 @@ void Map::loadCities(Vector<Vector<Tile>> &tileMap) {
     }
 }
 
-Vector<Map::Tile*> Map::getCityTiles(Vector<Vector<Tile>> &tileMap) {
-    Vector<Map::Tile*> cityTiles(cities.size());
+Vector<CityConnections::Tile*> CityConnections::getCityTiles(Vector<Vector<Tile>> &tileMap) {
+    Vector<CityConnections::Tile*> cityTiles(cities.size());
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
             Tile* tile = &tileMap[i][j];

@@ -12,18 +12,18 @@ struct City {
     String name;
 };
 
-class Map {
+class CityConnections {
 private:
     struct Tile {
         int x, y; char type; City* city = nullptr;
-        Tile(int x = 0, int y = 0,char type = Map::emptyTile) : type(type), x(x), y(y) {}
+        Tile(int x = 0, int y = 0,char type = CityConnections::emptyTile) : type(type), x(x), y(y) {}
     };
-    int width, height;
+    const int width, height;
     Vector<City> cities;
 public:
     static const char emptyTile = '.', cityTile = '*', roadTile = '#';
-    Map(int width, int height);
-    ~Map();
+    CityConnections(int width, int height);
+    ~CityConnections();
     void readMap();
 private: // helpers
     void loadCities(Vector<Vector<Tile>>&);

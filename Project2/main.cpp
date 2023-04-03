@@ -1,9 +1,9 @@
 #include <iostream>
-#include "Map.h"
+#include "CityConnections.h"
 using namespace std;
 
 int main() {
     int width, height; cin >> width >> height;
-    Map map(width, height);
-    map.readMap();
+    CityConnections connections(width, height);
+    connections.readMap();
 }
