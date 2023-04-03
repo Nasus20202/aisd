@@ -3,12 +3,18 @@
 #include "Vector.h"
 
 struct City {
-    Vector<City*> connections;
+    struct Connection {
+        City *city;
+        int distance;
+    };
+    Vector<Connection> connections;
     String name;
 };
 
+
 class Map {
 private:
+    static const char emptyTile = '.', cityTile = '*', roadTile = '#';
     int width, height;
     Vector<City> cities;
 public:

@@ -5,18 +5,18 @@ template<typename T>
 class Vector {
 protected:
     T* data = nullptr;
-    int elementCount = 0, allocated = 0;
+    unsigned int elementCount = 0, allocated = 0;
     const int resizeFactor = 2;
 public:
     Vector();
-    Vector(int size);
     ~Vector();
+    Vector(int size);
     Vector(Vector<T> &other);
     Vector(std::initializer_list<T> list);
     T& operator[](int index);
     Vector<T>& operator=(Vector<T> &other);
-    Vector<T> operator+(T value);
-    Vector<T>& operator+=(T value);
+    Vector<T> operator+(T &value);
+    Vector<T>& operator+=(T &value);
     Vector<T> operator+(Vector<T> &other);
     Vector<T>& operator+=(Vector<T> &other);
     bool operator==(Vector<T> &other) const;
@@ -24,8 +24,10 @@ public:
     int length() const;
     int getSize() const;
     int size() const;
-    void pushBack(T value);
-    void add(T value, int index);
+    void pushBack(T &value);
+    void add(T &value, int index);
+    void pushBack(T &&value);
+    void add(T &&value, int index);
     void remove(int index);
     void empty();
     void resize(int newSize);
@@ -34,6 +36,16 @@ public:
 template<typename T>
 Vector<T>::Vector(int size) {
     resize(size);
+}
+
+template<typename T>
+void Vector<T>::add(T &&value, int index){
+    add(value, index);
+}
+
+template<typename T>
+void Vector<T>::pushBack(T &&value) {
+    pushBack(value);
 }
 
 template<typename T>
@@ -72,7 +84,7 @@ void Vector<T>::remove(int index) {
 }
 
 template<typename T>
-void Vector<T>::add(T value, int index) {
+void Vector<T>::add(T &value, int index) {
     if(index < 0)
         index = 0;
     if(index > elementCount)
@@ -88,7 +100,7 @@ void Vector<T>::add(T value, int index) {
 }
 
 template<typename T>
-void Vector<T>::pushBack(T value) {
+void Vector<T>::pushBack(T &value) {
     if(elementCount == allocated){
         resize(resizeFactor*(allocated+1));
     }
@@ -144,13 +156,13 @@ Vector<T> Vector<T>::operator+(Vector<T> &other) {
 }
 
 template<typename T>
-Vector<T> &Vector<T>::operator+=(T value) {
+Vector<T> &Vector<T>::operator+=(T &value) {
     pushBack(value);
     return *this;
 }
 
 template<typename T>
-Vector<T> Vector<T>::operator+(T value) {
+Vector<T> Vector<T>::operator+(T &value) {
     Vector<T> result = *this;
     result += value;
     return result;
