@@ -1,10 +1,19 @@
 #include "CityConnections.h"
 #include "Queue.h"
 #include <iostream>
+using namespace std;
 
 CityConnections::CityConnections(int width, int height) : width(width), height(height) {}
 
 CityConnections::~CityConnections() {}
+
+
+City *CityConnections::getCityByName(String &name) {
+    for(int i = 0; i < cities.size(); i++)
+        if(cities[i].name == name)
+            return &cities[i];
+    return nullptr;
+}
 
 void CityConnections::readMap() {
     Vector<Vector<Tile>> tileMap(height,Vector<Tile>(width)); int cityCount = 0;
@@ -22,13 +31,31 @@ void CityConnections::readMap() {
     cities.resize(cityCount);
     loadCities(tileMap);
     createCityGraph(tileMap);
+    loadFlights();
 
     for(int i = 0; i < cities.length(); i++){
-        std::cout << cities[i].name << " : " << std::endl;
+        cout << cities[i].name << " : " << endl;
         for(int j = 0; j < cities[i].connections.size(); j++){
-            std::cout << cities[i].connections[j].city->name << " " << cities[i].connections[j].distance << std::endl;
+            cout << cities[i].connections[j].city->name << " " << cities[i].connections[j].distance << endl;
         }
-        std::cout << std::endl;
+        cout << endl;
+    }
+}
+
+void CityConnections::loadFlights() {
+    int count; cin >> count;
+    for(int i = 0; i < count; i++){
+        String input;
+        while(input.size() == 0)
+            cin >> input;
+        List<String> parts = input.split(' ');
+        if(parts.size() < 3)
+            throw;
+        String from = parts[0], to = parts[1]; int duration = parts[2].toInt();
+        City* fromCity = getCityByName(from), *toCity = getCityByName(to);
+        if(fromCity == nullptr || toCity == nullptr)
+            continue;
+        fromCity->connections.pushBack(City::Connection(toCity, duration));
     }
 }
 

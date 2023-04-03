@@ -26,7 +26,9 @@ public:
     ~CityConnections();
     void readMap();
 private: // helpers
+    City* getCityByName(String &name);
     void loadCities(Vector<Vector<Tile>>&);
     void createCityGraph(Vector<Vector<Tile>>&);
     Vector<Tile *> getCityTiles(Vector<Vector<Tile>>&);
+    void loadFlights();
 };
