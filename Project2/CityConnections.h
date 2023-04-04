@@ -10,6 +10,7 @@ struct City {
     };
     Vector<Connection> connections;
     String name;
+    int id = 0;
 };
 
 class CityConnections {
@@ -25,7 +26,10 @@ public:
     CityConnections(int width, int height);
     ~CityConnections();
     void readMap();
+    void calculatePath(String &from, String &to, bool showPath);
 private: // helpers
+    int distanceBetween(City* city1, City* city2);
+    City* findNearestCity(Vector<bool>&, Vector<int>&);
     City* getCityByName(String &name);
     void loadCities(Vector<Vector<Tile>>&);
     void createCityGraph(Vector<Vector<Tile>>&);

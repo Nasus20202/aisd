@@ -6,22 +6,22 @@ class Vector {
 protected:
     T* data = nullptr;
     unsigned int elementCount = 0, allocated = 0;
-    const int resizeFactor = 2;
+    static const int resizeFactor = 2;
 public:
     Vector();
     ~Vector();
     Vector(int size);
     Vector(int size, T value);
-    Vector(Vector<T> &other);
+    Vector(Vector &other);
     Vector(std::initializer_list<T> list);
     T& operator[](int index);
-    Vector<T>& operator=(Vector<T> &other);
+    Vector<T>& operator=(Vector &other);
     Vector<T> operator+(T &value);
     Vector<T>& operator+=(T &value);
-    Vector<T> operator+(Vector<T> &other);
-    Vector<T>& operator+=(Vector<T> &other);
-    bool operator==(Vector<T> &other) const;
-    bool operator!=(Vector<T> &other) const;
+    Vector<T> operator+(Vector &other);
+    Vector<T>& operator+=(Vector &other);
+    bool operator==(Vector &other) const;
+    bool operator!=(Vector &other) const;
     int length() const;
     int getSize() const;
     int size() const;
@@ -197,7 +197,7 @@ T &Vector<T>::operator[](int index) {
 }
 
 template<typename T>
-Vector<T>::Vector(Vector<T> &other) {
+Vector<T>::Vector(Vector &other) {
     *this = other;
 }
 

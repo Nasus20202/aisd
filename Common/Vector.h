@@ -6,7 +6,7 @@ class Vector {
 protected:
     T* data = nullptr;
     unsigned int elementCount = 0, allocated = 0;
-    const int resizeFactor = 2;
+    static const int resizeFactor = 2;
 public:
     Vector();
     ~Vector();

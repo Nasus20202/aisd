@@ -30,7 +30,7 @@ protected:
 public:
     List();
     ~List();
-    List(List &other);
+    List(const List &other);
     void pushBack (T &element);
     void pushBack (T &&element);
     T& operator[](listSize_t index);
@@ -110,7 +110,7 @@ template<typename T, blockSize_t blockSize>
 List<T, blockSize>::List() {}
 
 template<typename T, blockSize_t blockSize>
-List<T, blockSize>::List(List &other) : first(nullptr), last(nullptr), _size(0){
+List<T, blockSize>::List(const List &other) : first(nullptr), last(nullptr), _size(0){
     Node *node = other.first;
     while(node != nullptr){
         for(auto element : node->elements){
