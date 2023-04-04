@@ -16,7 +16,7 @@ City *CityConnections::getCityByName(String &name) {
 }
 
 void CityConnections::readMap() {
-    Vector<Vector<Tile>> tileMap(height,Vector<Tile>(width)); int cityCount = 0;
+    Vector<Tile> tileMap(height*width); int cityCount = 0;
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
             char c = getchar();
@@ -24,7 +24,7 @@ void CityConnections::readMap() {
                 c = getchar();
             if(c == (char) cityTile)
                 cityCount++;
-            tileMap[i].pushBack(Tile(j, i, c));
+            tileMap.pushBack(Tile(j, i, c));
         }
     }
     // read cities
@@ -32,7 +32,7 @@ void CityConnections::readMap() {
     loadCities(tileMap);
     createCityGraph(tileMap);
     loadFlights();
-
+    int a =2;
     /*for(int i = 0; i < cities.length(); i++){
         cout << cities[i].name << " : " << endl;
         for(int j = 0; j < cities[i].connections.size(); j++){
@@ -124,10 +124,10 @@ void CityConnections::loadFlights() {
         if(fromCity == nullptr || toCity == nullptr)
             continue;
         const int connectionsSize = fromCity->connections.size(); bool done = false;
-        for(int i = 0; i<connectionsSize; i++){
-            if(fromCity->connections[i].city->id == toCity->id){
-                if(fromCity->connections[i].distance > duration)
-                    fromCity->connections[i].distance = duration; done = true;
+        for(int j = 0; j < connectionsSize; j++){
+            if(fromCity->connections[j].city->id == toCity->id){
+                if(fromCity->connections[j].distance > duration)
+                    fromCity->connections[j].distance = duration; done = true;
                 break;
             }
         }
@@ -137,7 +137,7 @@ void CityConnections::loadFlights() {
     }
 }
 
-void CityConnections::createCityGraph(Vector<Vector<Tile>> &tileMap) {
+void CityConnections::createCityGraph(Vector<Tile> &tileMap) {
     Vector<Tile*> cityTiles = getCityTiles(tileMap);
     for(int i = 0; i < cityTiles.size(); i++){
         Tile* root = cityTiles[i];
@@ -146,7 +146,6 @@ void CityConnections::createCityGraph(Vector<Vector<Tile>> &tileMap) {
         Queue<Tile*> queue;
         queue.enqueue(root);
         visited[root->y][root->x] = true;
-        int depth = 0;
         while(!queue.isEmpty()) {
             Tile *tile = queue.dequeue();
             if (tile->type != cityTile && tile->type != roadTile)
@@ -160,7 +159,7 @@ void CityConnections::createCityGraph(Vector<Vector<Tile>> &tileMap) {
                         continue;
                     if(visited[newY][newX])
                         continue;
-                    Tile *nextTile = &tileMap[newY][newX];
+                    Tile *nextTile = &tileMap[newY*width+newX];
                     visited[newY][newX] = true;
                     if (nextTile->type == cityTile) {
                         root->city->connections.pushBack(City::Connection(nextTile->city, distance[tile->y][tile->x]+1));
@@ -175,10 +174,10 @@ void CityConnections::createCityGraph(Vector<Vector<Tile>> &tileMap) {
     }
 }
 
-void CityConnections::loadCities(Vector<Vector<Tile>> &tileMap) {
+void CityConnections::loadCities(Vector<Tile> &tileMap) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            Tile *tile = &tileMap[i][j];
+            Tile *tile = &tileMap[i*width+j];
             if (tile->type != cityTile)
                 continue;
             // create a new city
@@ -191,7 +190,7 @@ void CityConnections::loadCities(Vector<Vector<Tile>> &tileMap) {
                     for (int x = -1; x <= 1; x++) {
                         if (i + y < 0 || i + y >= height || j + x < 0 || j + x >= width)
                             continue;
-                        char value = tileMap[i + y][j + x].type;
+                        char value = tileMap[(i + y)*width + j + x].type;
                         if (value == cityTile || value == roadTile || value == emptyTile)
                             continue;
                         startingX = j + x;
@@ -201,13 +200,13 @@ void CityConnections::loadCities(Vector<Vector<Tile>> &tileMap) {
                 }
                 // move starting X as much to the left as possible
                 while (startingX > 0) {
-                    char value = tileMap[startingY][startingX - 1].type;
+                    char value = tileMap[startingY*width + startingX - 1].type;
                     if (value == cityTile || value == roadTile || value == emptyTile)
                         break;
                     startingX--;
                 }
                 while (startingX < width) {
-                    char value = tileMap[startingY][startingX].type;
+                    char value = tileMap[startingY*width + startingX].type;
                     if (value == cityTile || value == roadTile || value == emptyTile)
                         break;
                     currentCity->name.add(value);
@@ -220,11 +219,11 @@ void CityConnections::loadCities(Vector<Vector<Tile>> &tileMap) {
     }
 }
 
-Vector<CityConnections::Tile*> CityConnections::getCityTiles(Vector<Vector<Tile>> &tileMap) {
+Vector<CityConnections::Tile*> CityConnections::getCityTiles(Vector<Tile> &tileMap) {
     Vector<CityConnections::Tile*> cityTiles(cities.size());
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
-            Tile* tile = &tileMap[i][j];
+            Tile* tile = &tileMap[i*width+j];
             if(tile->type == cityTile) {
                 cityTiles.pushBack(tile);
             }

@@ -31,8 +31,8 @@ private: // helpers
     int distanceBetween(City* city1, City* city2);
     City* findNearestCity(Vector<bool>&, Vector<int>&);
     City* getCityByName(String &name);
-    void loadCities(Vector<Vector<Tile>>&);
-    void createCityGraph(Vector<Vector<Tile>>&);
-    Vector<Tile *> getCityTiles(Vector<Vector<Tile>>&);
+    void loadCities(Vector<Tile>&);
+    void createCityGraph(Vector<Tile>&);
+    Vector<Tile *> getCityTiles(Vector<Tile>&);
     void loadFlights();
 };
