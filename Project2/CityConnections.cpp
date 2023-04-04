@@ -141,11 +141,11 @@ void CityConnections::createCityGraph(Vector<Tile> &tileMap) {
     Vector<Tile*> cityTiles = getCityTiles(tileMap);
     for(int i = 0; i < cityTiles.size(); i++){
         Tile* root = cityTiles[i];
-        Vector<Vector<bool>> visited(height, Vector<bool>(width, false));
-        Vector<Vector<int>> distance(height, Vector<int>(width, 0));
+        Vector<bool> visited(height*width, false);
+        Vector<int> distance(height*width, 0);
         Queue<Tile*> queue;
         queue.enqueue(root);
-        visited[root->y][root->x] = true;
+        visited[root->y*width+root->x] = true;
         while(!queue.isEmpty()) {
             Tile *tile = queue.dequeue();
             if (tile->type != cityTile && tile->type != roadTile)
@@ -157,16 +157,16 @@ void CityConnections::createCityGraph(Vector<Tile> &tileMap) {
                     int newX = tile->x + x, newY = tile->y + y;
                     if (newX < 0 || newX >= width || newY < 0 || newY >= height)
                         continue;
-                    if(visited[newY][newX])
+                    if(visited[newY*width+newX])
                         continue;
                     Tile *nextTile = &tileMap[newY*width+newX];
-                    visited[newY][newX] = true;
+                    visited[newY*width+newX] = true;
                     if (nextTile->type == cityTile) {
-                        root->city->connections.pushBack(City::Connection(nextTile->city, distance[tile->y][tile->x]+1));
+                        root->city->connections.pushBack(City::Connection(nextTile->city, distance[tile->y*width + tile->x]+1));
                     }
                     else if(nextTile->type == roadTile) {
                         queue.enqueue(nextTile);
-                        distance[newY][newX] = distance[tile->y][tile->x]+1;
+                        distance[newY*width+newX] = distance[tile->y*width + tile->x]+1;
                     }
                 }
             }
