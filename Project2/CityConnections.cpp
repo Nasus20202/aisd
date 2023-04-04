@@ -32,7 +32,6 @@ void CityConnections::readMap() {
     loadCities(tileMap);
     createCityGraph(tileMap);
     loadFlights();
-    int a =2;
     /*for(int i = 0; i < cities.length(); i++){
         cout << cities[i].name << " : " << endl;
         for(int j = 0; j < cities[i].connections.size(); j++){
