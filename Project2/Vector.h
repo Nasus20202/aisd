@@ -38,8 +38,9 @@ public:
 template<typename T>
 Vector<T>::Vector(int size, T value) {
     resize(size);
+    elementCount = size;
     for(int i = 0; i < size; i++)
-        pushBack(value);
+        data[i] = value;
 }
 
 template<typename T>
