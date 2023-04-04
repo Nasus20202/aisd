@@ -42,7 +42,6 @@ void CityConnections::readMap() {
     }*/
 }
 
-
 void CityConnections::calculatePath(String &from, String &to, bool showPath) {
     City *source = getCityByName(from), *destination = getCityByName(to);
     if(source == nullptr || destination == nullptr)
@@ -123,6 +122,16 @@ void CityConnections::loadFlights() {
         String from = parts[0], to = parts[1]; int duration = parts[2].toInt();
         City* fromCity = getCityByName(from), *toCity = getCityByName(to);
         if(fromCity == nullptr || toCity == nullptr)
+            continue;
+        const int connectionsSize = fromCity->connections.size(); bool done = false;
+        for(int i = 0; i<connectionsSize; i++){
+            if(fromCity->connections[i].city->id == toCity->id){
+                if(fromCity->connections[i].distance > duration)
+                    fromCity->connections[i].distance = duration; done = true;
+                break;
+            }
+        }
+        if(done)
             continue;
         fromCity->connections.pushBack(City::Connection(toCity, duration));
     }

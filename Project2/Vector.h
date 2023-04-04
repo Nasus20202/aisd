@@ -12,7 +12,8 @@ public:
     ~Vector();
     Vector(int size);
     Vector(int size, T value);
-    Vector(Vector &other);
+    Vector(Vector &&other);
+    Vector(const Vector& other);
     Vector(std::initializer_list<T> list);
     T& operator[](int index);
     Vector<T>& operator=(Vector &other);
@@ -197,7 +198,11 @@ T &Vector<T>::operator[](int index) {
 }
 
 template<typename T>
-Vector<T>::Vector(Vector &other) {
+Vector<T>::Vector(Vector &&other) {
+    *this = other;
+}
+template<typename T>
+Vector<T>::Vector(const Vector& other) {
     *this = other;
 }
 

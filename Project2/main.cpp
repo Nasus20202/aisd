@@ -14,7 +14,7 @@ int main() {
         if(inputSplit.size() < 3) {
             i--;continue;
         }
-        source = inputSplit[0]; destination = inputSplit[1]; showPath = inputSplit[2][0] == '0' ? false : true;
+        source = inputSplit[0]; destination = inputSplit[1]; showPath = inputSplit[2][0] != '0';
         connections.calculatePath(source, destination, showPath);
     }
 }
