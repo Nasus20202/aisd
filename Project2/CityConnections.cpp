@@ -139,7 +139,21 @@ void CityConnections::loadFlights() {
 void CityConnections::createCityGraph(Vector<Tile> &tileMap) {
     Vector<Tile*> cityTiles = getCityTiles(tileMap);
     for(int i = 0; i < cityTiles.size(); i++){
-        Tile* root = cityTiles[i];
+        Tile* root = cityTiles[i]; bool anyConnections = false;
+        for (int x = -1; x <= 1 && !anyConnections; x++) {
+            for (int y = -1; y <= 1 && !anyConnections; y++) {
+                if ((x == 0) == (y == 0))
+                    continue;
+                int newX = root->x + x, newY = root->y + y;
+                if (newX < 0 || newX >= width || newY < 0 || newY >= height)
+                    continue;
+                Tile *nextTile = &tileMap[newY*width+newX];
+                if(nextTile->type == roadTile || nextTile->type == cityTile)
+                    anyConnections = true;
+            }
+        }
+        if(!anyConnections)
+            continue;
         Vector<bool> visited(height*width, false);
         Vector<int> distance(height*width, 0);
         Queue<Tile*> queue;
