@@ -2,7 +2,6 @@
 #include "Queue.h"
 #include "PriorityQueue.h"
 #include <iostream>
-#include <queue>
 
 using namespace std;
 CityConnections::CityConnections(int width, int height) : width(width), height(height) {}
@@ -13,7 +12,7 @@ City *CityConnections::getCityByName(String name) {
     return cityHashMap[name];
 }
 
-void CityConnections::readMap(bool isTest) {
+void CityConnections::readMap() {
     Vector<Tile> tileMap(height*width); int cityCount = 0;
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
@@ -30,12 +29,17 @@ void CityConnections::readMap(bool isTest) {
     cityHashMap.resize(cityCount*3);
     Vector<Tile*> cityTiles = loadCities(tileMap);
     createCityGraph(tileMap, cityTiles);
-    loadFlights(isTest);
-    if(isTest)
-        cout << "Cities: " << cities.size() << endl;
+    loadFlights();
 }
 
 void CityConnections::calculatePath(String &from, String &to, bool showPath) {
+    // Reference: https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+    struct QueueItem {
+        City *city;
+        int priority;
+        QueueItem(City *city = nullptr, int priority = 0) : city(city), priority(priority) {}
+        bool operator>(QueueItem &other) { return priority > other.priority;}
+    };
     City *source = getCityByName(from), *destination = getCityByName(to);
     if(source == nullptr || destination == nullptr)
         throw;
@@ -43,15 +47,14 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
     Vector<int> distance(size, INT32_MAX);
     Vector<City*> previous(size, nullptr);
     Vector<bool> visited(size, false);
-    priority_queue<pair<int, City*>, vector<pair<int, City*>>, greater<pair<int, City*>>> queue;
-    queue.push(make_pair(0, source));
+    PriorityQueue<QueueItem> queue(false);
+    queue.push(QueueItem(source, 0));
     distance[source->id] = 0;
-    while(!queue.empty()){
-        City* currentCity = queue.top().second;
+    while(queue.size() > 0){
+        City* currentCity = queue.pop().city;
         visited[currentCity->id] = true;
         if(currentCity->id == destination->id)
             break;
-        queue.pop();
         const int neighboursCount = currentCity->connections.size();
         for(int i = 0; i < neighboursCount; i++){
             City *neighbour = currentCity->connections[i].city;
@@ -62,7 +65,7 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
             if(altDistance < distance[neighbourId]){
                 distance[neighbourId] = altDistance;
                 previous[neighbourId] = currentCity;
-                queue.push(make_pair(altDistance, neighbour));
+                queue.push(QueueItem(neighbour, altDistance));
             }
         }
     }
@@ -82,20 +85,8 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
     cout << endl;
 }
 
-int CityConnections::distanceBetween(City *city1, City *city2) {
-    int distance = INT32_MAX;
-    const int size = city1->connections.size();
-    for(int i = 0; i < size; i++){
-        if(city1->connections[i].city->id == city2->id && city1->connections[i].distance < distance)
-            distance = city1->connections[i].distance;
-    }
-    return distance;
-}
-
-void CityConnections::loadFlights(bool isTest) {
+void CityConnections::loadFlights() {
     int count; cin >> count;
-    if(isTest)
-        cout << "Flights count: " << count << endl;
     for(int i = 0; i < count; i++){
         String tab[3];
         for(int j = 0; j < 3; j++){
@@ -114,6 +105,7 @@ void CityConnections::loadFlights(bool isTest) {
 }
 
 void CityConnections::createCityGraph(Vector<Tile> &tileMap, Vector<Tile*> &cityTiles) {
+    // Reference: https://en.wikipedia.org/wiki/Breadth-first_search
     for(int i = 0; i < cityTiles.size(); i++){
         Tile* root = cityTiles[i]; bool anyConnections = false;
         for (int x = -1; x <= 1 && !anyConnections; x++) {

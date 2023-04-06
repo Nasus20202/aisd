@@ -27,12 +27,11 @@ public:
     static const char emptyTile = '.', cityTile = '*', roadTile = '#';
     CityConnections(int width, int height);
     ~CityConnections();
-    void readMap(bool isTest = false);
+    void readMap();
     void calculatePath(String &from, String &to, bool showPath);
 private: // helpers
-    int distanceBetween(City* city1, City* city2);
     City* getCityByName(String name);
     Vector<Tile *> loadCities(Vector<Tile>&);
     void createCityGraph(Vector<Tile>&, Vector<Tile*>&);
-    void loadFlights(bool isTest = false);
+    void loadFlights();
 };

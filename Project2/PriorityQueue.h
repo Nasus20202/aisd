@@ -1,113 +1,117 @@
 #pragma once
 #include "Vector.h"
-// Reference: https://www.programiz.com/dsa/priority-queue
+// Reference: https://www.geeksforgeeks.org/priority-queue-using-binary-heap/ (no code was copied from this site)
+// and https://gist.github.com/jizhilong/6774742 (no code was copied from this site)
 
-template<typename T>
+template <typename T>
 class PriorityQueue {
 private:
-    struct Node {
-        T value ;
-        int priority;
-        Node() : value(T()), priority(1) {}
-        Node(T value, int priority) : value(value), priority(priority) {}
-    };
-    int offset = 0;
-    Vector<Node> data;
-    void heapify(int index);
+    bool isMaxHeap = true;
+    Vector<T> data;
+    int elementCount = 0;
+    bool compare(T &a, T &b);
+    bool compareIndex(int index1, int index2);
+    static int getLeftChildIndex(int index);
+    static int getRightChildIndex(int index);
+    static int getParentIndex(int index);
+    void shiftUp(int index);
+    void shiftDown(int index);
 public:
-    void setDataSize(int size);
-    void pushWithoutHeapify(T &value, int priority = 1);
-    void pushWithoutHeapify(T &&value, int priority = 1);
-    void heapifyAll();
-    void push(T &&value, int priority = 1);
-    void push(T &value, int priority = 1);
-    void changePriority(T& value, int priority = 1);
     int size();
-    T& peek();
+    void push(T &value);
+    void push(T &&value);
     T pop();
+    T& peek();
+    T& operator[](int index);
+    explicit PriorityQueue(bool isMaxHeap = true) : isMaxHeap(isMaxHeap) {}
 };
 
 template<typename T>
-void PriorityQueue<T>::setDataSize(int size) {
-    data.resize(size);
+T &PriorityQueue<T>::operator[](int index) {
+    return data[index];
 }
 
 template<typename T>
-void PriorityQueue<T>::pushWithoutHeapify(T &value, int priority) {
-    data.pushBack(Node(value, priority));
+void PriorityQueue<T>::push(T &&value) {
+    elementCount++;
+    if(elementCount <= data.size())
+        data[elementCount-1] = value;
+    else
+        data.pushBack(value);
+    shiftUp(elementCount-1);
 }
 
-template<typename T>
-void PriorityQueue<T>::pushWithoutHeapify(T &&value, int priority) {
-    data.pushBack(Node(value, priority));
-}
 
 template<typename T>
-void PriorityQueue<T>::heapifyAll() {
-    for(int i = data.size() / 2 - 1; i >= 0; i--)
-        heapify(i);
-}
-
-template<typename T>
-void PriorityQueue<T>::changePriority(T &value, int priority) {
-    for(int i = offset; i < data.size(); i++) {
-        if(data[i].value == value) {
-            data[i].priority = priority;
-            heapifyAll();
-            return;
-        }
-    }
+void PriorityQueue<T>::push(T &value) {
+    elementCount++;
+    if(elementCount <= data.size())
+        data[elementCount-1] = value;
+    else
+        data.pushBack(value);
+    shiftUp(elementCount-1);
 }
 
 template<typename T>
 int PriorityQueue<T>::size() {
-    return data.size();
-}
-
-template<typename T>
-T PriorityQueue<T>::pop() {
-    T value = data[0].value;
-    data[0] = data[data.size()-1];
-    data.remove(data.size()-1);
-    heapifyAll();
-    return value;
+    return elementCount;
 }
 
 template<typename T>
 T &PriorityQueue<T>::peek() {
-    return data[0].value;
-}
-
-
-template<typename T>
-void PriorityQueue<T>::push(T &&value, int priority) {
-    push(value, priority);
+    return data[0];
 }
 
 template<typename T>
-void PriorityQueue<T>::push(T &value, int priority) {
-    if(data.size() == 0)
-        data.pushBack(Node(value, priority));
-    else {
-        data.pushBack(Node(value, priority));
-        heapifyAll();
+T PriorityQueue<T>::pop() {
+    T value = data[0];
+    std::swap(data[0], data[elementCount-1]);
+    elementCount--;
+    shiftDown(0);
+    return value;
+}
+
+template<typename T>
+void PriorityQueue<T>::shiftDown(int index) {
+    T value = data[index];
+    int leftChildIndex = getLeftChildIndex(index);
+    while (leftChildIndex < elementCount) {
+        if(leftChildIndex+1 < elementCount && compareIndex(leftChildIndex, leftChildIndex+1))
+            leftChildIndex++;
+        if(compareIndex(index, leftChildIndex)){
+            data[index] = data[leftChildIndex];
+            index = leftChildIndex;
+            leftChildIndex = getLeftChildIndex(index);
+        } else
+            break;
     }
+    data[index] = value;
 }
 
 template<typename T>
-void PriorityQueue<T>::heapify(int index) {       // min heap
-    int left = 2 * index + 1;
-    int right = 2 * index + 2;
-    int smallest = index;
-    if (left < data.size() && data[left].priority < data[smallest].priority)
-        smallest = left;
-    if (right < data.size() && data[right].priority < data[smallest].priority)
-        smallest = right;
-
-    if (smallest != index) {
-        Node temp = data[index];
-        data[index] = data[smallest];
-        data[smallest] = temp;
-        heapify(smallest);
-    }
+void PriorityQueue<T>::shiftUp(int index) {
+    for(int i = getParentIndex(index); i>=0 && compareIndex(i, index) && i != index; index = i, i = getParentIndex(index))
+        std::swap(data[i], data[index]);
 }
+
+
+template<typename T>
+bool PriorityQueue<T>::compareIndex(int index1, int index2) {
+    return compare(data[index1], data[index2]);
+}
+
+template<typename T>
+bool PriorityQueue<T>::compare(T &a, T &b) {
+    if(isMaxHeap)
+        return !(a > b);
+    return a > b;
+}
+
+template<typename T>
+int PriorityQueue<T>::getLeftChildIndex(int index) { return (2*index + 1); }
+
+template<typename T>
+int PriorityQueue<T>::getRightChildIndex(int index) { return (2*index + 2); }
+
+template<typename T>
+int PriorityQueue<T>::getParentIndex(int index) { return (index-1)/2; }
