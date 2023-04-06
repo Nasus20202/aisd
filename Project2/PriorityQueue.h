@@ -11,6 +11,7 @@ private:
         Node() : value(T()), priority(1) {}
         Node(T value, int priority) : value(value), priority(priority) {}
     };
+    int offset = 0;
     Vector<Node> data;
     void heapify(int index);
 public:
@@ -21,7 +22,6 @@ public:
     void push(T &&value, int priority = 1);
     void push(T &value, int priority = 1);
     void changePriority(T& value, int priority = 1);
-    void changePriorityByIndex(int index, int priority = 1);
     int size();
     T& peek();
     T pop();
@@ -50,7 +50,7 @@ void PriorityQueue<T>::heapifyAll() {
 
 template<typename T>
 void PriorityQueue<T>::changePriority(T &value, int priority) {
-    for(int i = 0; i < data.size(); i++) {
+    for(int i = offset; i < data.size(); i++) {
         if(data[i].value == value) {
             data[i].priority = priority;
             heapifyAll();

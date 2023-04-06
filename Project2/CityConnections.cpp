@@ -2,8 +2,10 @@
 #include "Queue.h"
 #include "PriorityQueue.h"
 #include <iostream>
-using namespace std;
+#include <vector>
+#include <queue>
 
+using namespace std;
 CityConnections::CityConnections(int width, int height) : width(width), height(height) {}
 
 CityConnections::~CityConnections() {}
@@ -12,7 +14,7 @@ City *CityConnections::getCityByName(String name) {
     return cityHashMap[name];
 }
 
-void CityConnections::readMap() {
+void CityConnections::readMap(bool isTest) {
     Vector<Tile> tileMap(height*width); int cityCount = 0;
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
@@ -27,9 +29,11 @@ void CityConnections::readMap() {
     // read cities
     cities.resize(cityCount);
     cityHashMap.resize(cityCount*3);
-    loadCities(tileMap);
-    createCityGraph(tileMap);
-    loadFlights();
+    Vector<Tile*> cityTiles = loadCities(tileMap);
+    createCityGraph(tileMap, cityTiles);
+    loadFlights(isTest);
+    if(isTest)
+        cout << "Cities: " << cities.size() << endl;
 }
 
 void CityConnections::calculatePath(String &from, String &to, bool showPath) {
@@ -37,10 +41,36 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
     if(source == nullptr || destination == nullptr)
         throw;
     const int size = cities.size();
-    Vector<int> distance(size, INT32_MAX);
+    vector<int> distance(size, INT32_MAX);
+    vector<City*> previous(size, nullptr);
+    vector<bool> visited(size, false);
+    priority_queue<pair<int, City*>, vector<pair<int, City*>>, greater<pair<int, City*>>> queue;
+    queue.push(make_pair(0, source));
+    distance[source->id] = 0; bool done = false;
+    while(!queue.empty() && !done){
+        City* currentCity = queue.top().second;
+        visited[currentCity->id] = true;
+        if(currentCity->id == destination->id) {
+            done = true; break;
+        }
+        queue.pop();
+        const int neighboursCount = currentCity->connections.size();
+        for(int i = 0; i < neighboursCount; i++){
+            City *neighbour = currentCity->connections[i].city;
+            if(visited[neighbour->id])
+                continue;
+            const int neighbourId = neighbour->id;
+            int altDistance = distance[currentCity->id] + distanceBetween(currentCity, neighbour);
+            if(altDistance < distance[neighbourId]){
+                distance[neighbourId] = altDistance;
+                previous[neighbourId] = currentCity;
+                queue.push(make_pair(altDistance, neighbour));
+            }
+        }
+    }
+    /*Vector<int> distance(size, INT32_MAX);
     Vector<City*> previous(size, nullptr);
     PriorityQueue<City*> queue;
-    queue.setDataSize(size);
     for(int i = 0; i < size; i++)
         queue.pushWithoutHeapify(&cities[i], INT32_MAX);
     queue.changePriority(source, 0); // it will heapify
@@ -58,8 +88,7 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
                 queue.changePriority(neighbour, altDistance);
             }
         }
-    }
-
+    }*/
     cout << distance[destination->id] << " ";
     if(showPath){
         City *path = previous[destination->id];
@@ -75,21 +104,6 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
     cout << endl;
 }
 
-City *CityConnections::findNearestCity(Vector<bool> &citiesQueue, Vector<int> &distance) {
-    int minDistance = INT32_MAX; City* city = nullptr; const int size = cities.size();
-    for(int i = 0; i < size; i++){
-        City *currentCity = &cities[i];
-        const int id = currentCity->id;
-        if(!citiesQueue[id])
-            continue;
-        if(distance[id] < minDistance){
-            city = currentCity;
-            minDistance = distance[city->id];
-        }
-    }
-    return city;
-}
-
 int CityConnections::distanceBetween(City *city1, City *city2) {
     const int size = city1->connections.size();
     for(int i = 0; i < size; i++){
@@ -99,20 +113,24 @@ int CityConnections::distanceBetween(City *city1, City *city2) {
     return INT32_MAX;
 }
 
-void CityConnections::loadFlights() {
+void CityConnections::loadFlights(bool isTest) {
     int count; cin >> count;
+    if(isTest)
+        cout << "Flights count: " << count << endl;
     for(int i = 0; i < count; i++){
-        String input;
-        while(input.size() == 0)
-            cin >> input;
-        List<String> parts = input.split(' ');
-        if(parts.size() < 3)
-            throw;
-        String from = parts[0], to = parts[1]; int duration = parts[2].toInt();
-        City* fromCity = getCityByName(from), *toCity = getCityByName(to);
-        if(fromCity == nullptr || toCity == nullptr)
-            continue;
-        const int connectionsSize = fromCity->connections.size(); bool done = false;
+        String tab[3];
+        for(int j = 0; j < 3; j++){
+            char c = getchar();
+            while(c == '\n' || c == ' ')
+                c = getchar();
+            do {
+                tab[j].add(c);
+                c = getchar();
+            } while(c != '\n' && c != ' ' && c != EOF);
+        }
+        int duration = tab[2].toInt();
+        City* fromCity = getCityByName(tab[0]), *toCity = getCityByName(tab[1]);
+        /*const int connectionsSize = fromCity->connections.size(); bool done = false;
         for(int j = 0; j < connectionsSize; j++){
             if(fromCity->connections[j].city->id == toCity->id){
                 if(fromCity->connections[j].distance > duration)
@@ -121,13 +139,12 @@ void CityConnections::loadFlights() {
             }
         }
         if(done)
-            continue;
+            continue;*/
         fromCity->connections.pushBack(City::Connection(toCity, duration));
     }
 }
 
-void CityConnections::createCityGraph(Vector<Tile> &tileMap) {
-    Vector<Tile*> cityTiles = getCityTiles(tileMap);
+void CityConnections::createCityGraph(Vector<Tile> &tileMap, Vector<Tile*> &cityTiles) {
     for(int i = 0; i < cityTiles.size(); i++){
         Tile* root = cityTiles[i]; bool anyConnections = false;
         for (int x = -1; x <= 1 && !anyConnections; x++) {
@@ -177,7 +194,8 @@ void CityConnections::createCityGraph(Vector<Tile> &tileMap) {
     }
 }
 
-void CityConnections::loadCities(Vector<Tile> &tileMap) {
+Vector<CityConnections::Tile*> CityConnections::loadCities(Vector<Tile> &tileMap) {
+    Vector<Tile*> cityTiles;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             Tile *tile = &tileMap[i*width+j];
@@ -218,21 +236,9 @@ void CityConnections::loadCities(Vector<Tile> &tileMap) {
                 currentCity->id = cities.size() - 1;
                 tile->city = currentCity;
                 cityHashMap[currentCity->name] = currentCity;
-            }
-        }
-    }
-}
-
-Vector<CityConnections::Tile*> CityConnections::getCityTiles(Vector<Tile> &tileMap) {
-    Vector<CityConnections::Tile*> cityTiles(cities.size());
-    for(int i = 0; i < height; i++){
-        for(int j = 0; j < width; j++){
-            Tile* tile = &tileMap[i*width+j];
-            if(tile->type == cityTile) {
                 cityTiles.pushBack(tile);
             }
         }
     }
     return cityTiles;
 }
-
