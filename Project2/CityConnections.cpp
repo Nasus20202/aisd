@@ -8,11 +8,8 @@ CityConnections::CityConnections(int width, int height) : width(width), height(h
 CityConnections::~CityConnections() {}
 
 
-City *CityConnections::getCityByName(String &name) {
-    for(int i = 0; i < cities.size(); i++)
-        if(cities[i].name == name)
-            return &cities[i];
-    return nullptr;
+City *CityConnections::getCityByName(String name) {
+    return cityHashMap[name];
 }
 
 void CityConnections::readMap() {
@@ -29,6 +26,7 @@ void CityConnections::readMap() {
     }
     // read cities
     cities.resize(cityCount);
+    cityHashMap.resize(cityCount*3);
     loadCities(tileMap);
     createCityGraph(tileMap);
     loadFlights();
@@ -227,6 +225,7 @@ void CityConnections::loadCities(Vector<Tile> &tileMap) {
                 }
                 currentCity->id = cities.size() - 1;
                 tile->city = currentCity;
+                cityHashMap[currentCity->name] = currentCity;
             }
         }
     }

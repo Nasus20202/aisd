@@ -35,6 +35,7 @@ public:
     bool isInt() const;
     int count(char c) const;
     void add(char c);
+    unsigned int hash() const;
 protected:
     friend std::ostream& operator<<(std::ostream &os, String& s);
     friend std::istream& operator>>(std::istream &is, String& s);

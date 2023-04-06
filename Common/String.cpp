@@ -247,3 +247,14 @@ String &String::operator+=(String &s) {
     return *this;
 }
 
+unsigned int String::hash() const {
+    unsigned int hash = 0;
+    unsigned int base = 1;
+    for(int i = 0; i < stringSize; i++){
+        char c = characters[i] - ' ' + 1;
+        hash += c*base;
+        base*=97;
+    }
+    return hash;
+}
+

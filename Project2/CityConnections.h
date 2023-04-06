@@ -1,6 +1,7 @@
 #pragma once
 #include "String.h"
 #include "Vector.h"
+#include "HashMap.h"
 
 struct City {
     struct Connection {
@@ -21,6 +22,7 @@ private:
     };
     const int width, height;
     Vector<City> cities;
+    HashMap<String, City*> cityHashMap;
 public:
     static const char emptyTile = '.', cityTile = '*', roadTile = '#';
     CityConnections(int width, int height);
@@ -30,7 +32,7 @@ public:
 private: // helpers
     int distanceBetween(City* city1, City* city2);
     City* findNearestCity(Vector<bool>&, Vector<int>&);
-    City* getCityByName(String &name);
+    City* getCityByName(String name);
     void loadCities(Vector<Tile>&);
     void createCityGraph(Vector<Tile>&);
     Vector<Tile *> getCityTiles(Vector<Tile>&);
