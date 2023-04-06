@@ -11,17 +11,19 @@ public:
     Vector();
     ~Vector();
     Vector(int size);
-    Vector(int size, T value);
-    Vector(Vector<T> &other);
+    Vector(int size, T &value);
+    Vector(int size, T &&value);
+    Vector(Vector &&other);
+    Vector(const Vector& other);
     Vector(std::initializer_list<T> list);
     T& operator[](int index);
-    Vector<T>& operator=(Vector<T> &other);
-    Vector<T> operator+(T &value);
+    Vector<T>& operator=(Vector &other);
+    Vector<T> operator+(T &value) const;
     Vector<T>& operator+=(T &value);
-    Vector<T> operator+(Vector<T> &other);
-    Vector<T>& operator+=(Vector<T> &other);
-    bool operator==(Vector<T> &other) const;
-    bool operator!=(Vector<T> &other) const;
+    Vector<T> operator+(Vector &other) const;
+    Vector<T>& operator+=(Vector &other);
+    bool operator==(Vector &other) const;
+    bool operator!=(Vector &other) const;
     int length() const;
     int getSize() const;
     int size() const;
@@ -35,10 +37,19 @@ public:
 };
 
 template<typename T>
-Vector<T>::Vector(int size, T value) {
+Vector<T>::Vector(int size, T &&value) {
     resize(size);
+    elementCount = size;
     for(int i = 0; i < size; i++)
-        pushBack(value);
+        data[i] = value;
+}
+
+template<typename T>
+Vector<T>::Vector(int size, T &value) {
+    resize(size);
+    elementCount = size;
+    for(int i = 0; i < size; i++)
+        data[i] = value;
 }
 
 template<typename T>
@@ -157,7 +168,7 @@ Vector<T> &Vector<T>::operator+=(Vector<T> &other) {
 }
 
 template<typename T>
-Vector<T> Vector<T>::operator+(Vector<T> &other) {
+Vector<T> Vector<T>::operator+(Vector<T> &other) const {
     Vector<T> result = *this;
     result += other;
     return result;
@@ -170,7 +181,7 @@ Vector<T> &Vector<T>::operator+=(T &value) {
 }
 
 template<typename T>
-Vector<T> Vector<T>::operator+(T &value) {
+Vector<T> Vector<T>::operator+(T &value) const {
     Vector<T> result = *this;
     result += value;
     return result;
@@ -197,7 +208,11 @@ T &Vector<T>::operator[](int index) {
 }
 
 template<typename T>
-Vector<T>::Vector(Vector<T> &other) {
+Vector<T>::Vector(Vector &&other) {
+    *this = other;
+}
+template<typename T>
+Vector<T>::Vector(const Vector& other) {
     *this = other;
 }
 

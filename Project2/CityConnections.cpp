@@ -167,7 +167,7 @@ Vector<CityConnections::Tile*> CityConnections::loadCities(Vector<Tile> &tileMap
                 cities.pushBack(City());
                 City *currentCity = &cities[cities.size() - 1];
                 // read city name
-                int startingX, startingY;
+                int startingX = 0, startingY = 0;
                 for (int y = -1; y <= 1; y++) {
                     for (int x = -1; x <= 1; x++) {
                         if (i + y < 0 || i + y >= height || j + x < 0 || j + x >= width)
