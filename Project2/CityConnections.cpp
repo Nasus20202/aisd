@@ -1,5 +1,6 @@
 #include "CityConnections.h"
 #include "Queue.h"
+#include "PriorityQueue.h"
 #include <iostream>
 using namespace std;
 
@@ -36,30 +37,29 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
     if(source == nullptr || destination == nullptr)
         throw;
     const int size = cities.size();
-    Vector<bool> queue(size, true);
     Vector<int> distance(size, INT32_MAX);
-    Vector<bool> visited(size, false);
     Vector<City*> previous(size, nullptr);
+    PriorityQueue<City*> queue;
+    queue.setDataSize(size);
+    for(int i = 0; i < size; i++)
+        queue.pushWithoutHeapify(&cities[i], INT32_MAX);
+    queue.changePriority(source, 0); // it will heapify
     distance[source->id] = 0;
     while(queue.size() > 0){
-        City* currentCity = findNearestCity(queue, distance);
-        if(currentCity == nullptr)
-            break;
-        queue[currentCity->id] = false; // remove from queue
-
+        City* currentCity = queue.pop();
         const int neighboursCount = currentCity->connections.size();
         for(int i = 0; i < neighboursCount; i++){
             City *neighbour = currentCity->connections[i].city;
             const int neighbourId = neighbour->id;
-            if(!queue[neighbourId])
-                continue;
             int altDistance = distance[currentCity->id] + distanceBetween(currentCity, neighbour);
             if(altDistance < distance[neighbourId]){
                 distance[neighbourId] = altDistance;
                 previous[neighbourId] = currentCity;
+                queue.changePriority(neighbour, altDistance);
             }
         }
     }
+
     cout << distance[destination->id] << " ";
     if(showPath){
         City *path = previous[destination->id];

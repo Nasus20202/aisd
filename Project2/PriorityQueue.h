@@ -11,20 +11,57 @@ private:
         Node() : value(T()), priority(1) {}
         Node(T value, int priority) : value(value), priority(priority) {}
     };
-    int elementCount = 0;
     Vector<Node> data;
     void heapify(int index);
 public:
+    void setDataSize(int size);
+    void pushWithoutHeapify(T &value, int priority = 1);
+    void pushWithoutHeapify(T &&value, int priority = 1);
+    void heapifyAll();
     void push(T &&value, int priority = 1);
     void push(T &value, int priority = 1);
+    void changePriority(T& value, int priority = 1);
+    void changePriorityByIndex(int index, int priority = 1);
     int size();
     T& peek();
     T pop();
 };
 
 template<typename T>
+void PriorityQueue<T>::setDataSize(int size) {
+    data.resize(size);
+}
+
+template<typename T>
+void PriorityQueue<T>::pushWithoutHeapify(T &value, int priority) {
+    data.pushBack(Node(value, priority));
+}
+
+template<typename T>
+void PriorityQueue<T>::pushWithoutHeapify(T &&value, int priority) {
+    data.pushBack(Node(value, priority));
+}
+
+template<typename T>
+void PriorityQueue<T>::heapifyAll() {
+    for(int i = data.size() / 2 - 1; i >= 0; i--)
+        heapify(i);
+}
+
+template<typename T>
+void PriorityQueue<T>::changePriority(T &value, int priority) {
+    for(int i = 0; i < data.size(); i++) {
+        if(data[i].value == value) {
+            data[i].priority = priority;
+            heapifyAll();
+            return;
+        }
+    }
+}
+
+template<typename T>
 int PriorityQueue<T>::size() {
-    return elementCount;
+    return data.size();
 }
 
 template<typename T>
@@ -32,8 +69,7 @@ T PriorityQueue<T>::pop() {
     T value = data[0].value;
     data[0] = data[data.size()-1];
     data.remove(data.size()-1);
-    for(int i = data.size()/2-1; i >= 0; i--)
-        heapify(i);
+    heapifyAll();
     return value;
 }
 
@@ -54,25 +90,24 @@ void PriorityQueue<T>::push(T &value, int priority) {
         data.pushBack(Node(value, priority));
     else {
         data.pushBack(Node(value, priority));
-        for(int i = data.size()/2-1; i >= 0; i--)
-            heapify(i);
+        heapifyAll();
     }
 }
 
 template<typename T>
-void PriorityQueue<T>::heapify(int index) {
+void PriorityQueue<T>::heapify(int index) {       // min heap
     int left = 2 * index + 1;
     int right = 2 * index + 2;
-    int largest = index;
-    if (left < data.size() && data[left].priority > data[largest].priority)
-        largest = left;
-    if (right < data.size() && data[right].priority > data[largest].priority)
-        largest = right;
+    int smallest = index;
+    if (left < data.size() && data[left].priority < data[smallest].priority)
+        smallest = left;
+    if (right < data.size() && data[right].priority < data[smallest].priority)
+        smallest = right;
 
-    if (largest != index) {
+    if (smallest != index) {
         Node temp = data[index];
-        data[index] = data[largest];
-        data[largest] = temp;
-        heapify(largest);
+        data[index] = data[smallest];
+        data[smallest] = temp;
+        heapify(smallest);
     }
 }

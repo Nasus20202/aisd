@@ -16,10 +16,23 @@ private:
 public:
     void push(T &&value, int priority = 1);
     void push(T &value, int priority = 1);
+    void changePriority(T& value, int priority = 1);
     int size();
     T& peek();
     T pop();
 };
+
+template<typename T>
+void PriorityQueue<T>::changePriority(T &value, int priority) {
+    for(int i = 0; i < data.size(); i++) {
+        if(data[i].value == value) {
+            data[i].priority = priority;
+            for(int j = data.size()/2-1; j >= 0; j--)
+                heapify(j);
+            return;
+        }
+    }
+}
 
 template<typename T>
 int PriorityQueue<T>::size() {
