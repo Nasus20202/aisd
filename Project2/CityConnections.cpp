@@ -58,7 +58,7 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
             if(visited[neighbour->id])
                 continue;
             const int neighbourId = neighbour->id;
-            int altDistance = distance[currentCity->id] + distanceBetween(currentCity, neighbour);
+            int altDistance = distance[currentCity->id] + currentCity->connections[i].distance;
             if(altDistance < distance[neighbourId]){
                 distance[neighbourId] = altDistance;
                 previous[neighbourId] = currentCity;
@@ -66,27 +66,7 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
             }
         }
     }
-    /*Vector<int> distance(size, INT32_MAX);
-    Vector<City*> previous(size, nullptr);
-    PriorityQueue<City*> queue;
-    for(int i = 0; i < size; i++)
-        queue.pushWithoutHeapify(&cities[i], INT32_MAX);
-    queue.changePriority(source, 0); // it will heapify
-    distance[source->id] = 0;
-    while(queue.size() > 0){
-        City* currentCity = queue.pop();
-        const int neighboursCount = currentCity->connections.size();
-        for(int i = 0; i < neighboursCount; i++){
-            City *neighbour = currentCity->connections[i].city;
-            const int neighbourId = neighbour->id;
-            int altDistance = distance[currentCity->id] + distanceBetween(currentCity, neighbour);
-            if(altDistance < distance[neighbourId]){
-                distance[neighbourId] = altDistance;
-                previous[neighbourId] = currentCity;
-                queue.changePriority(neighbour, altDistance);
-            }
-        }
-    }*/
+
     cout << distance[destination->id] << " ";
     if(showPath){
         City *path = previous[destination->id];
@@ -129,16 +109,6 @@ void CityConnections::loadFlights(bool isTest) {
         }
         int duration = tab[2].toInt();
         City* fromCity = getCityByName(tab[0]), *toCity = getCityByName(tab[1]);
-        /*const int connectionsSize = fromCity->connections.size(); bool done = false;
-        for(int j = 0; j < connectionsSize; j++){
-            if(fromCity->connections[j].city->id == toCity->id){
-                if(fromCity->connections[j].distance > duration)
-                    fromCity->connections[j].distance = duration; done = true;
-                break;
-            }
-        }
-        if(done)
-            continue;*/
         fromCity->connections.pushBack(City::Connection(toCity, duration));
     }
 }
