@@ -7,7 +7,6 @@ CityConnections::CityConnections(int width, int height) : width(width), height(h
 
 CityConnections::~CityConnections() {}
 
-
 City *CityConnections::getCityByName(String name) {
     return cityHashMap[name];
 }
@@ -30,13 +29,6 @@ void CityConnections::readMap() {
     loadCities(tileMap);
     createCityGraph(tileMap);
     loadFlights();
-    /*for(int i = 0; i < cities.length(); i++){
-        cout << cities[i].name << " : " << endl;
-        for(int j = 0; j < cities[i].connections.size(); j++){
-            cout << cities[i].connections[j].city->name << " " << cities[i].connections[j].distance << endl;
-        }
-        cout << endl;
-    }*/
 }
 
 void CityConnections::calculatePath(String &from, String &to, bool showPath) {
