@@ -2,7 +2,6 @@
 #include "Queue.h"
 #include "PriorityQueue.h"
 #include <iostream>
-#include <vector>
 #include <queue>
 
 using namespace std;
@@ -41,18 +40,17 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
     if(source == nullptr || destination == nullptr)
         throw;
     const int size = cities.size();
-    vector<int> distance(size, INT32_MAX);
-    vector<City*> previous(size, nullptr);
-    vector<bool> visited(size, false);
+    Vector<int> distance(size, INT32_MAX);
+    Vector<City*> previous(size, nullptr);
+    Vector<bool> visited(size, false);
     priority_queue<pair<int, City*>, vector<pair<int, City*>>, greater<pair<int, City*>>> queue;
     queue.push(make_pair(0, source));
-    distance[source->id] = 0; bool done = false;
-    while(!queue.empty() && !done){
+    distance[source->id] = 0;
+    while(!queue.empty()){
         City* currentCity = queue.top().second;
         visited[currentCity->id] = true;
-        if(currentCity->id == destination->id) {
-            done = true; break;
-        }
+        if(currentCity->id == destination->id)
+            break;
         queue.pop();
         const int neighboursCount = currentCity->connections.size();
         for(int i = 0; i < neighboursCount; i++){
@@ -105,12 +103,13 @@ void CityConnections::calculatePath(String &from, String &to, bool showPath) {
 }
 
 int CityConnections::distanceBetween(City *city1, City *city2) {
+    int distance = INT32_MAX;
     const int size = city1->connections.size();
     for(int i = 0; i < size; i++){
-        if(city1->connections[i].city->id == city2->id)
-            return city1->connections[i].distance;
+        if(city1->connections[i].city->id == city2->id && city1->connections[i].distance < distance)
+            distance = city1->connections[i].distance;
     }
-    return INT32_MAX;
+    return distance;
 }
 
 void CityConnections::loadFlights(bool isTest) {
