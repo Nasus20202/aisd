@@ -175,6 +175,8 @@ Vector<CityConnections::Tile*> CityConnections::loadCities(Vector<Tile> &tileMap
                         char value = tileMap[(i + y)*width + j + x].type;
                         if (value == cityTile || value == roadTile || value == emptyTile)
                             continue;
+                        // check if there is a road or empty tile next to the city name, if not, skip this tile
+                        // that would mean that the name found belongs to another city
                         if(y != 0){
                             int newX = j + x, newY = i + y; bool isOk = false;
                             if(newX == 0 || newX == width - 1)
