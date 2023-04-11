@@ -1,5 +1,4 @@
 #pragma once
-#include <initializer_list>
 
 template<typename T>
 class Vector {
@@ -15,7 +14,6 @@ public:
     Vector(int size, T &&value);
     Vector(Vector &&other);
     Vector(const Vector& other);
-    Vector(std::initializer_list<T> list);
     T& operator[](int index);
     Vector<T>& operator=(Vector &other);
     Vector<T> operator+(T &value) const;
@@ -65,12 +63,6 @@ void Vector<T>::add(T &&value, int index){
 template<typename T>
 void Vector<T>::pushBack(T &&value) {
     pushBack(value);
-}
-
-template<typename T>
-Vector<T>::Vector(std::initializer_list<T> list) {
-    for(T value : list)
-        pushBack(value);
 }
 
 template<typename T>

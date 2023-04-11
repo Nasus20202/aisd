@@ -6,6 +6,7 @@
 template <typename T>
 class PriorityQueue {
 private:
+    void swap(int index1, int index2);
     bool isMaxHeap = true;
     Vector<T> data;
     int elementCount = 0;
@@ -25,6 +26,13 @@ public:
     T& operator[](int index);
     explicit PriorityQueue(bool isMaxHeap = true) : isMaxHeap(isMaxHeap) {}
 };
+
+template<typename T>
+void PriorityQueue<T>::swap(int index1, int index2) {
+    T temp = data[index1];
+    data[index1] = data[index2];
+    data[index2] = temp;
+}
 
 template<typename T>
 T &PriorityQueue<T>::operator[](int index) {
@@ -65,7 +73,7 @@ T &PriorityQueue<T>::peek() {
 template<typename T>
 T PriorityQueue<T>::pop() {
     T value = data[0];
-    std::swap(data[0], data[elementCount-1]);
+    swap(0, elementCount-1);
     elementCount--;
     shiftDown(0);
     return value;
@@ -91,7 +99,7 @@ void PriorityQueue<T>::shiftDown(int index) {
 template<typename T>
 void PriorityQueue<T>::shiftUp(int index) {
     for(int i = getParentIndex(index); i>=0 && compareIndex(i, index) && i != index; index = i, i = getParentIndex(index))
-        std::swap(data[i], data[index]);
+        swap(i, index);
 }
 
 

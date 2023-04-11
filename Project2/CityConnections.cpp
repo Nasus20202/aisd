@@ -175,6 +175,23 @@ Vector<CityConnections::Tile*> CityConnections::loadCities(Vector<Tile> &tileMap
                         char value = tileMap[(i + y)*width + j + x].type;
                         if (value == cityTile || value == roadTile || value == emptyTile)
                             continue;
+                        if(y != 0){
+                            int newX = j + x, newY = i + y; bool isOk = false;
+                            if(newX == 0 || newX == width - 1)
+                                isOk = true;
+                            if(newX > 0){
+                                char leftValue = tileMap[newY*width + newX - 1].type;
+                                if(leftValue == roadTile || leftValue == emptyTile)
+                                    isOk = true;
+                            }
+                            if(newX < width - 1){
+                                char rightValue = tileMap[newY*width + newX + 1].type;
+                                if(rightValue == roadTile || rightValue == emptyTile)
+                                    isOk = true;
+                            }
+                            if(!isOk)
+                                continue;
+                        }
                         startingX = j + x;
                         startingY = i + y;
                         break;
