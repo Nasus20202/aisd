@@ -130,9 +130,7 @@ void String::empty() {
 }
 
 std::ostream &operator<<(std::ostream &os, String &s) {
-    int size = s.length();
-    for(int i = 0; i < size; i++)
-        os << s[i];
+    os << s.characters;
     return os;
 }
 
