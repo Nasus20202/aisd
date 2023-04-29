@@ -12,4 +12,8 @@ private:
     void Query();
 public:
     void Run();
+
+    void PrintGameState();
+
+    void DoMove();
 };

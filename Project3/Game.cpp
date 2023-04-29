@@ -20,6 +20,11 @@ void Game::Query() {
         PrintGameBoard();
     else if(input == "PRINT_COORDINATES")
         PrintCoordinates();
+    else if(input == "PRINT_GAME_STATE")
+        PrintGameState();
+    else if(input == "DO_MOVE"){
+        DoMove();
+    }
     else if(input.size() > 0)
         cout << "Unknown command" << endl;
 }
@@ -27,7 +32,7 @@ void Game::Query() {
 void Game::LoadGameBoard() {
     int boardSize, pawnsToCollect, blackStartingPawns, whiteStartingPawns, blackPawns, whitePawns;
     char currentPlayer;
-    cin >> boardSize >> pawnsToCollect >> blackStartingPawns >> whiteStartingPawns >> blackPawns >> whitePawns >> currentPlayer;
+    cin >> boardSize >> pawnsToCollect >> whiteStartingPawns >> blackStartingPawns >> whitePawns >> blackPawns >> currentPlayer;
     board = Board(boardSize, pawnsToCollect, blackStartingPawns, whiteStartingPawns, blackPawns, whitePawns, currentPlayer);
     board.LoadGameBoard();
 }
@@ -39,11 +44,12 @@ void Game::PrintGameBoard() {
 void Game::PrintCoordinates() {
     int lineLength = board.size;
     for(int letter = 0; letter <= board.getMaxHeight() + 1; letter++){
-        const int spaces = (board.getMaxHeight() - lineLength + 1);
+        const int spaces = board.getMaxHeight() - lineLength+1;
         for(int i = 0; i < spaces; i++)
             cout << "  ";
-        for(int number = 0; number <= lineLength; number++){
-            cout << char(letter+'A') << number+1 << "  ";
+        for(int number = 0; number <= lineLength; number++) {
+            Coordinate coordinate(letter, number);
+            cout << coordinate << "  ";
         }
         cout << endl;
         if(letter < board.size)
@@ -51,4 +57,15 @@ void Game::PrintCoordinates() {
         else
             lineLength--;
     }
+}
+
+void Game::PrintGameState() {
+    board.PrintGameState();
+}
+
+void Game::DoMove() {
+    Coordinate from, to;
+    cin >> from >> to;
+    cout << "DO_MOVE " << from << " " << to << endl;
+    board.DoMove(from.Decrement(), to.Decrement()); // Decrementing to match the indexing of the board
 }

@@ -28,6 +28,7 @@ public:
     int size() const;
     int getSize() const;
     bool contains(char c) const;
+    bool startsWith(const char array[]) const;
     void remove(char c);
     void remove(int index);
     void empty();

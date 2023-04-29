@@ -148,7 +148,7 @@ std::istream &operator>>(std::istream &is, String &s) {
         char c = is.get();
         if(is.eof())
             break;
-        if (c == '\0' || c == '\n')
+        if (c == '\0' || c == '\n' || c == ' ')
             done = true;
         else
             s.add(c);
@@ -261,5 +261,18 @@ unsigned int String::hash() const {
         base*=97;
     }
     return hash;
+}
+
+bool String::startsWith(const char *array) const {
+    int size = 0;
+    while(*array != '\0'){
+        if(size >= stringSize)
+            return false;
+        if(characters[size] != *array)
+            return false;
+        array++;
+        size++;
+    }
+    return true;
 }
 

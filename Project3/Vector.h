@@ -13,7 +13,7 @@ public:
     Vector(int size, T &value);
     Vector(int size, T &&value);
     Vector(Vector &&other);
-    Vector(const Vector& other);
+    Vector(Vector& other);
     T& operator[](int index);
     Vector<T>& operator=(Vector &other);
     Vector<T>& operator=(Vector &&other);
@@ -221,7 +221,7 @@ Vector<T>::Vector(Vector &&other) {
     *this = other;
 }
 template<typename T>
-Vector<T>::Vector(const Vector& other) {
+Vector<T>::Vector(Vector& other) {
     *this = other;
 }
 
