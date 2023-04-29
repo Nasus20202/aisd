@@ -22,9 +22,8 @@ void Game::Query() {
         PrintCoordinates();
     else if(input == "PRINT_GAME_STATE")
         PrintGameState();
-    else if(input == "DO_MOVE"){
+    else if(input == "DO_MOVE")
         DoMove();
-    }
     else if(input.size() > 0)
         cout << "Unknown command" << endl;
 }

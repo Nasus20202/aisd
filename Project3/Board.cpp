@@ -36,31 +36,17 @@ int Board::getMaxHeight() {
 }
 
 void Board::LoadGameBoard() {
-    int lineLength = size; int black = 0, white = 0;
+    int lineLength = size;
     for(int letter = 0; letter < getMaxHeight(); letter++){
         for(int number = 0; number < lineLength; number++){
             char c;
             cin >> c;
-            if(c == blackPawn)
-                black++;
-            else if(c == whitePawn)
-                white++;
             setTile(Coordinate(letter, number), c);
         }
         if(letter < size - 1)
             lineLength++;
         else
             lineLength--;
-    }
-    if(blackPawns + black != blackStartingPawns){
-        gameState = BadMove;
-        lastCommand.color = blackPawn;
-        cout << "Bad input: black pawns count is not correct" << endl;
-    }
-    if(whitePawns + white != whiteStartingPawns){
-        gameState = BadMove;
-        lastCommand.color = whitePawn;
-        cout << "Bad input: white pawns count is not correct" << endl;
     }
 }
 
@@ -120,22 +106,39 @@ void Board::DoMove(Coordinate from, Coordinate to) {
 
 Vector<Coordinate> Board::GetNeighbours(Coordinate from) {
     Vector<Coordinate> neighbours(6);
-    for(int letter = from.letter -1; letter <= from.letter +1; letter++){
-        for(int number = from.number -1; number <= from.number + 1; number++){
-            if(letter == from.letter && number == from.number)
-                number++;
-            Coordinate neighbour(letter, number);
-            if(IsInBounds(neighbour))
-                neighbours.pushBack(neighbour);
-        }
+    Vector<Coordinate> possibleNeighbours(6);
+    possibleNeighbours.pushBack(Coordinate(from.letter, from.number - 1)); // left
+    possibleNeighbours.pushBack(Coordinate(from.letter, from.number + 1)); // right
+    if(from.letter < size - 1){
+        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number - 1 )); // top left
+        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number)); // top right
+        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number)); // bottom left
+        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number + 1)); // bottom right
+    }
+    else if(from.letter == size - 1){
+        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number - 1 )); // top left
+        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number)); // top right
+        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number - 1)); // bottom left
+        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number)); // bottom right
+    }
+    else {
+        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number)); // top left
+        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number + 1)); // top right
+        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number - 1)); // bottom left
+        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number)); // bottom right
+    }
+    for(int i = 0; i < possibleNeighbours.size(); i++){
+        if(IsInBounds(possibleNeighbours[i]))
+            neighbours.pushBack(possibleNeighbours[i]);
     }
     return neighbours;
 }
 
 bool Board::IsMoveValid(Coordinate from, Coordinate to) {
-    if(IsInBounds(from) || !IsInBounds(to)){
+    if(IsInBounds(from))
         return false;
-    }
+    if(!IsInBounds(to))
+        return false;
     Vector<Coordinate> neighbours = GetNeighbours(from);
     bool found = false;
     for(int i = 0; i < neighbours.size(); i++){
@@ -154,9 +157,8 @@ bool Board::MovePawns(Coordinate from, Coordinate to) {
         return false;
     char toColor = getTile(to);
     bool isOk = true;
-    if(toColor != emptyTile){
+    if(toColor != emptyTile)
         isOk = MovePawns(to, NextCoordinate(from, to));
-    }
     char fromColor = currentPlayer;
     if(IsInBounds(from)) {
         fromColor = getTile(from);
@@ -170,24 +172,66 @@ bool Board::MovePawns(Coordinate from, Coordinate to) {
 bool Board::IsInBounds(Coordinate coordinate) {
     if(coordinate.letter < 0 || coordinate.letter >= getMaxHeight())
         return false;
-    const int maxNumber = coordinate.letter + size - 1;
+    int distanceFromCenter = coordinate.letter - (size - 1);
+    if(distanceFromCenter < 0)
+        distanceFromCenter *= -1;
+    int maxNumber = getMaxHeight() - distanceFromCenter - 1;
     if(coordinate.number < 0 || coordinate.number > maxNumber)
         return false;
     return true;
 }
 
 Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) {
-    int nextLetter;
-    if(from.letter == to.letter)
-        nextLetter = to.letter;
-    else if(to.letter > from.letter)
-        nextLetter = to.letter + 1;
-    else
-        nextLetter = to.letter - 1;
-    int nextNumber = 2*to.number - from.number;
-    int offset = nextNumber - size + 1;
-    if(offset > 0)
-        nextNumber -= offset;
+    int nextLetter = 2*to.letter-from.letter, nextNumber = 0;
+    // Calculate next number based on the direction
+    if(from.letter == to.letter) // same level
+        nextNumber = 2*to.number - from.number;
+    else if(from.letter < to.letter) // going down
+    {
+        if(to.letter < size - 1){ // top part
+            if(to.number == from.number){ // going down left
+                nextNumber = to.number;
+            }
+            else{
+                nextNumber = to.number + 1; // going down right
+            }
+        }
+        else if (to.letter >= size){ // bottom part
+            if(to.number == from.number){ // going down right
+                nextNumber = to.number;
+            } else {
+                nextNumber = to.number - 1; // going down left
+            }
+        }
+        else{ // middle part
+            if(to.number == from.number){ // going down left
+                nextNumber = to.number - 1;
+            } else {
+                nextNumber = to.number; // going down right
+            }
+        }
+    } else { // going top
+        if(to.letter < size - 1) { // top part
+            if(to.number == from.number){ // going top right
+                nextNumber = to.number;
+            } else {
+                nextNumber = to.number - 1; // going top left
+            }
+        }
+        else if(to.letter >= size){ // bottom part
+            if(to.number == from.number){ // going top left
+                nextNumber = to.number;
+            } else {
+                nextNumber = to.number + 1; // going top right
+            }
+        } else { // middle part
+            if(to.number == from.number){ // going top left
+                nextNumber = to.number - 1;
+            } else {
+                nextNumber = to.number; // going top left
+            }
+        }
+    }
     return Coordinate(nextLetter, nextNumber);
 }
 
