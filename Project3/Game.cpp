@@ -65,6 +65,11 @@ void Game::PrintGameState() {
 void Game::DoMove() {
     Coordinate from, to;
     cin >> from >> to;
-    cout << "DO_MOVE " << from << " " << to << endl;
-    board.DoMove(from.Decrement(), to.Decrement()); // Decrementing to match the indexing of the board
+    Board tempBoard = board;
+    tempBoard.DoMove(from.Decrement(), to.Decrement()); // Decrementing to match the indexing of the board
+    if(board.gameState != BadMove)
+        board.lastCommand = tempBoard.lastCommand;
+    board.gameState = tempBoard.gameState;
+    if(board.gameState != BadMove)
+        board = tempBoard;
 }
