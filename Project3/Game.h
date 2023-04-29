@@ -8,6 +8,7 @@ private:
 
     void LoadGameBoard();
     void PrintGameBoard();
+    void PrintCoordinates();
     void Query();
 public:
     void Run();

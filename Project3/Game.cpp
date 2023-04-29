@@ -18,6 +18,8 @@ void Game::Query() {
         LoadGameBoard();
     else if(input == "PRINT_GAME_BOARD")
         PrintGameBoard();
+    else if(input == "PRINT_COORDINATES")
+        PrintCoordinates();
     else if(input.size() > 0)
         cout << "Unknown command" << endl;
 }
@@ -32,15 +34,19 @@ void Game::LoadGameBoard() {
 
 void Game::PrintGameBoard() {
     board.PrintBoard();
+}
 
+void Game::PrintCoordinates() {
     int lineLength = board.size;
-    for(int letter = 0; letter < board.getMaxHeight(); letter++){
-        for(int number = 0; number < lineLength; number++){
-            char c = board.getTile(letter, number);
-            cout << char(letter+'B') << number+2 << ' ' << c << ' ';
+    for(int letter = 0; letter <= board.getMaxHeight() + 1; letter++){
+        const int spaces = (board.getMaxHeight() - lineLength + 1);
+        for(int i = 0; i < spaces; i++)
+            cout << "  ";
+        for(int number = 0; number <= lineLength; number++){
+            cout << char(letter+'A') << number+1 << "  ";
         }
         cout << endl;
-        if(letter < board.size - 1)
+        if(letter < board.size)
             lineLength++;
         else
             lineLength--;
