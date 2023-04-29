@@ -5,7 +5,7 @@ using namespace std;
 
 Board::Board(int boardSize, int pawnsToCollect, int blackStartingPawns, int whiteStartingPawns, int blackPawns,
              int whitePawns, char currentPlayer) {
-    this->boardSize = boardSize;
+    this->size = boardSize;
     this->pawnsToCollect = pawnsToCollect;
     this->blackStartingPawns = blackStartingPawns;
     this->whiteStartingPawns = whiteStartingPawns;
@@ -19,31 +19,31 @@ Board::Board(int boardSize, int pawnsToCollect, int blackStartingPawns, int whit
         board.pushBack(c);
 }
 
-void Board::setTile(int y, int x, char color) {
-    board[getIndex(y, x)] = color;
+void Board::setTile(int letter, int number, char color) {
+    board[getIndex(letter, number)] = color;
 }
 
-char Board::getTile(int y, int x) {
-    return board[getIndex(y, x)];
+char Board::getTile(int letter, int number) {
+    return board[getIndex(letter, number)];
 }
 
-int Board::getIndex(int y, int x) {
-    return y*getMaxHeight()+x;
+int Board::getIndex(int letter, int number) {
+    return letter * getMaxHeight() + number;
 }
 
 int Board::getMaxHeight() {
-    return 2*boardSize-1;
+    return 2 * size - 1;
 }
 
 void Board::LoadGameBoard() {
-    int lineLength = boardSize;
-    for(int line = 0; line < getMaxHeight(); line++){
-        for(int i = 0; i < lineLength; i++){
+    int lineLength = size;
+    for(int letter = 0; letter < getMaxHeight(); letter++){
+        for(int number = 0; number < lineLength; number++){
             char c;
             cin >> c;
-            setTile(line, i, c);
+            setTile(letter, number, c);
         }
-        if(line < boardSize-1)
+        if(letter < size - 1)
             lineLength++;
         else
             lineLength--;
@@ -51,16 +51,16 @@ void Board::LoadGameBoard() {
 }
 
 void Board::PrintBoard() {
-    int lineLength = boardSize;
-    for(int line = 0; line < getMaxHeight(); line++){
+    int lineLength = size;
+    for(int letter = 0; letter < getMaxHeight(); letter++){
         const int spaces = getMaxHeight() - lineLength;
         for(int i = 0; i < spaces; i++)
             cout << ' ';
-        for(int i = 0; i < lineLength; i++){
-            cout << getTile(line, i) << ' ';
+        for(int number = 0; number < lineLength; number++){
+            cout << getTile(letter, number) << ' ';
         }
         cout << endl;
-        if(line < boardSize-1)
+        if(letter < size - 1)
             lineLength++;
         else
             lineLength--;

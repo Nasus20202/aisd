@@ -32,4 +32,17 @@ void Game::LoadGameBoard() {
 
 void Game::PrintGameBoard() {
     board.PrintBoard();
+
+    int lineLength = board.size;
+    for(int letter = 0; letter < board.getMaxHeight(); letter++){
+        for(int number = 0; number < lineLength; number++){
+            char c = board.getTile(letter, number);
+            cout << char(letter+'B') << number+2 << ' ' << c << ' ';
+        }
+        cout << endl;
+        if(letter < board.size - 1)
+            lineLength++;
+        else
+            lineLength--;
+    }
 }
