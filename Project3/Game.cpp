@@ -60,6 +60,35 @@ void Game::PrintCoordinates() {
 
 void Game::PrintGameState() {
     board.PrintGameState();
+    Vector<Vector<Coordinate>> straight = board.GetStraightLines();
+    Vector<Vector<Coordinate>> leftToRight = board.GetLeftToRightDiagonalLines();
+    Vector<Vector<Coordinate>> rightToLeft = board.GetRightToLeftDiagonalLines();
+
+    cout << "Straight lines: " << endl;
+    for(int i = 0; i < straight.size(); i++) {
+        for(int j = 0; j < straight[i].size(); j++) {
+            Coordinate c = straight[i][j].Increment();
+            cout << c << " ";
+        }
+        cout << endl;
+    }
+    cout << "Left to right diagonal lines: " << endl;
+    for(int i = 0; i < leftToRight.size(); i++) {
+        for(int j = 0; j < leftToRight[i].size(); j++) {
+            Coordinate c = leftToRight[i][j].Increment();
+            cout << c << " ";
+        }
+        cout << endl;
+    }
+    cout << "Right to left diagonal lines: " << endl;
+    for(int i = 0; i < rightToLeft.size(); i++) {
+        for(int j = 0; j < rightToLeft[i].size(); j++) {
+            Coordinate c = rightToLeft[i][j].Increment();
+            cout << c << " ";
+        }
+        cout << endl;
+    }
+
 }
 
 void Game::DoMove() {
@@ -67,9 +96,9 @@ void Game::DoMove() {
     cin >> from >> to;
     Board tempBoard = board;
     tempBoard.DoMove(from.Decrement(), to.Decrement()); // Decrementing to match the indexing of the board
-    if(board.gameState != BadMove)
+    if(board.gameState == InProgress)
         board.lastCommand = tempBoard.lastCommand;
     board.gameState = tempBoard.gameState;
-    if(board.gameState != BadMove)
+    if(board.gameState == InProgress)
         board = tempBoard;
 }

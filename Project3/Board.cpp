@@ -168,7 +168,6 @@ bool Board::MovePawns(Coordinate from, Coordinate to) {
     return isOk;
 }
 
-
 bool Board::IsInBounds(Coordinate coordinate) {
     if(coordinate.letter < 0 || coordinate.letter >= getMaxHeight())
         return false;
@@ -234,6 +233,83 @@ Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) {
     }
     return Coordinate(nextLetter, nextNumber);
 }
+
+
+Vector<Vector<Coordinate>> Board::GetStraightLines() {
+    Vector<Vector<Coordinate>> lines;
+    for(int i = 0; i < getMaxHeight(); i++){
+        Coordinate from(i, -1);
+        Coordinate to(i, 0);
+        Vector<Coordinate> line;
+        while(IsInBounds(to)){
+            line.pushBack(to);
+            Coordinate next = NextCoordinate(from, to);
+            from = to;
+            to = next;
+        }
+        lines.pushBack(line);
+    }
+    return lines;
+}
+
+Vector<Vector<Coordinate>> Board::GetLeftToRightDiagonalLines() {
+    Vector<Vector<Coordinate>> lines;
+    for(int i = size-1; i > 0; i--){
+        Coordinate from(-1, i-1);
+        Coordinate to(0, i);
+        Vector<Coordinate> line;
+        while(IsInBounds(to)){
+            line.pushBack(to);
+            Coordinate next = NextCoordinate(from, to);
+            from = to;
+            to = next;
+        }
+        lines.pushBack(line);
+    }
+    for(int i = 0; i < size; i++){
+        Coordinate from(i-1, -1);
+        Coordinate to(i, 0);
+        Vector<Coordinate> line;
+        while(IsInBounds(to)){
+            line.pushBack(to);
+            Coordinate next = NextCoordinate(from, to);
+            from = to;
+            to = next;
+        }
+        lines.pushBack(line);
+    }
+    return lines;
+}
+
+Vector<Vector<Coordinate>> Board::GetRightToLeftDiagonalLines() {
+    Vector<Vector<Coordinate>> lines;
+    for(int i = 0; i < size; i++){
+        Coordinate from(-1, i);
+        Coordinate to(0, i);
+        Vector<Coordinate> line;
+        while(IsInBounds(to)){
+            line.pushBack(to);
+            Coordinate next = NextCoordinate(from, to);
+            from = to;
+            to = next;
+        }
+        lines.pushBack(line);
+    }
+    for(int i = 1; i < size; i++){
+        Coordinate from(i-1, size+i-1);
+        Coordinate to(i, size+i-1);
+        Vector<Coordinate> line;
+        while(IsInBounds(to)){
+            line.pushBack(to);
+            Coordinate next = NextCoordinate(from, to);
+            from = to;
+            to = next;
+        }
+        lines.pushBack(line);
+    }
+    return lines;
+}
+
 
 std::ostream &operator<<(ostream &os, Coordinate &c) {
     os << (char)('A' + c.letter) << c.number + 1;

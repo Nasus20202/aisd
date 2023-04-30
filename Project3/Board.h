@@ -59,4 +59,8 @@ public:
     bool IsInBounds(Coordinate coordinate);
     bool IsMoveValid(Coordinate from, Coordinate to);
     Vector<Coordinate> GetNeighbours(Coordinate from);
+
+    Vector<Vector<Coordinate>> GetStraightLines();
+    Vector<Vector<Coordinate>> GetLeftToRightDiagonalLines();
+    Vector<Vector<Coordinate>> GetRightToLeftDiagonalLines();
 };
