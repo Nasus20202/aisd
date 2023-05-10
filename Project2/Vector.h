@@ -100,7 +100,7 @@ void Vector<T>::add(T &value, int index) {
         index = 0;
     if(index > elementCount)
         index = elementCount;
-    if(elementCount == allocated){
+    if(elementCount == allcated){
         resize(resizeFactor*(allocated+1));
     }
     for(int i = elementCount; i > index; i--){

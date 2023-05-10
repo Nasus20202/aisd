@@ -16,7 +16,7 @@ Board::Board(int boardSize, int pawnsToCollect, int blackStartingPawns, int whit
     board.resize(maxH*maxH);
     char c = emptyTile;
     for(int i = 0; i < maxH*maxH; i++)
-        board.pushBack(c);
+        board.push_back(c);
 }
 
 void Board::setTile(Coordinate coordinate, char color) {
@@ -104,32 +104,32 @@ void Board::DoMove(Coordinate from, Coordinate to) {
     }
 }
 
-Vector<Coordinate> Board::GetNeighbours(Coordinate from) {
-    Vector<Coordinate> neighbours(6);
-    Vector<Coordinate> possibleNeighbours(6);
-    possibleNeighbours.pushBack(Coordinate(from.letter, from.number - 1)); // left
-    possibleNeighbours.pushBack(Coordinate(from.letter, from.number + 1)); // right
+vector<Coordinate> Board::GetNeighbours(Coordinate from) {
+    vector<Coordinate> neighbours(6);
+    vector<Coordinate> possibleNeighbours(6);
+    possibleNeighbours.emplace_back(from.letter, from.number - 1); // left
+    possibleNeighbours.emplace_back(from.letter, from.number + 1); // right
     if(from.letter < size - 1){
-        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number - 1 )); // top left
-        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number)); // top right
-        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number)); // bottom left
-        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number + 1)); // bottom right
+        possibleNeighbours.emplace_back(from.letter - 1, from.number - 1 ); // top left
+        possibleNeighbours.emplace_back(from.letter - 1, from.number); // top right
+        possibleNeighbours.emplace_back(from.letter + 1, from.number); // bottom left
+        possibleNeighbours.emplace_back(from.letter + 1, from.number + 1); // bottom right
     }
     else if(from.letter == size - 1){
-        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number - 1 )); // top left
-        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number)); // top right
-        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number - 1)); // bottom left
-        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number)); // bottom right
+        possibleNeighbours.emplace_back(from.letter - 1, from.number - 1 ); // top left
+        possibleNeighbours.emplace_back(from.letter - 1, from.number); // top right
+        possibleNeighbours.emplace_back(from.letter + 1, from.number - 1); // bottom left
+        possibleNeighbours.emplace_back(from.letter + 1, from.number); // bottom right
     }
     else {
-        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number)); // top left
-        possibleNeighbours.pushBack(Coordinate(from.letter - 1, from.number + 1)); // top right
-        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number - 1)); // bottom left
-        possibleNeighbours.pushBack(Coordinate(from.letter + 1, from.number)); // bottom right
+        possibleNeighbours.emplace_back(from.letter - 1, from.number); // top left
+        possibleNeighbours.emplace_back(from.letter - 1, from.number + 1); // top right
+        possibleNeighbours.emplace_back(from.letter + 1, from.number - 1); // bottom left
+        possibleNeighbours.emplace_back(from.letter + 1, from.number); // bottom right
     }
-    for(int i = 0; i < possibleNeighbours.size(); i++){
-        if(IsInBounds(possibleNeighbours[i]))
-            neighbours.pushBack(possibleNeighbours[i]);
+    for(auto possibleNeighbour : possibleNeighbours){
+        if(IsInBounds(possibleNeighbour))
+            neighbours.push_back(possibleNeighbour);
     }
     return neighbours;
 }
@@ -139,10 +139,10 @@ bool Board::IsMoveValid(Coordinate from, Coordinate to) {
         return false;
     if(!IsInBounds(to))
         return false;
-    Vector<Coordinate> neighbours = GetNeighbours(from);
+    vector<Coordinate> neighbours = GetNeighbours(from);
     bool found = false;
-    for(int i = 0; i < neighbours.size(); i++){
-        if(neighbours[i] == to){
+    for(auto & neighbour : neighbours){
+        if(neighbour == to){
             found = true;
             break;
         }
@@ -235,77 +235,77 @@ Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) {
 }
 
 
-Vector<Vector<Coordinate>> Board::GetStraightLines() {
-    Vector<Vector<Coordinate>> lines;
+vector<vector<Coordinate>> Board::GetStraightLines() {
+    vector<vector<Coordinate>> lines;
     for(int i = 0; i < getMaxHeight(); i++){
         Coordinate from(i, -1);
         Coordinate to(i, 0);
-        Vector<Coordinate> line;
+        vector<Coordinate> line;
         while(IsInBounds(to)){
-            line.pushBack(to);
+            line.push_back(to);
             Coordinate next = NextCoordinate(from, to);
             from = to;
             to = next;
         }
-        lines.pushBack(line);
+        lines.push_back(line);
     }
     return lines;
 }
 
-Vector<Vector<Coordinate>> Board::GetLeftToRightDiagonalLines() {
-    Vector<Vector<Coordinate>> lines;
+vector<vector<Coordinate>> Board::GetLeftToRightDiagonalLines() {
+    vector<vector<Coordinate>> lines;
     for(int i = size-1; i > 0; i--){
         Coordinate from(-1, i-1);
         Coordinate to(0, i);
-        Vector<Coordinate> line;
+        vector<Coordinate> line;
         while(IsInBounds(to)){
-            line.pushBack(to);
+            line.push_back(to);
             Coordinate next = NextCoordinate(from, to);
             from = to;
             to = next;
         }
-        lines.pushBack(line);
+        lines.push_back(line);
     }
     for(int i = 0; i < size; i++){
         Coordinate from(i-1, -1);
         Coordinate to(i, 0);
-        Vector<Coordinate> line;
+        vector<Coordinate> line;
         while(IsInBounds(to)){
-            line.pushBack(to);
+            line.push_back(to);
             Coordinate next = NextCoordinate(from, to);
             from = to;
             to = next;
         }
-        lines.pushBack(line);
+        lines.push_back(line);
     }
     return lines;
 }
 
-Vector<Vector<Coordinate>> Board::GetRightToLeftDiagonalLines() {
-    Vector<Vector<Coordinate>> lines;
+vector<vector<Coordinate>> Board::GetRightToLeftDiagonalLines() {
+    vector<vector<Coordinate>> lines;
     for(int i = 0; i < size; i++){
         Coordinate from(-1, i);
         Coordinate to(0, i);
-        Vector<Coordinate> line;
+        vector<Coordinate> line;
         while(IsInBounds(to)){
-            line.pushBack(to);
+            line.push_back(to);
             Coordinate next = NextCoordinate(from, to);
             from = to;
             to = next;
         }
-        lines.pushBack(line);
+        lines.push_back(line);
     }
     for(int i = 1; i < size; i++){
         Coordinate from(i-1, size+i-1);
         Coordinate to(i, size+i-1);
-        Vector<Coordinate> line;
+        vector<Coordinate> line;
         while(IsInBounds(to)){
-            line.pushBack(to);
+            line.push_back(to);
             Coordinate next = NextCoordinate(from, to);
             from = to;
             to = next;
         }
-        lines.pushBack(line);
+        lines.push_back(line);
     }
     return lines;
 }
@@ -344,14 +344,14 @@ Coordinate::Coordinate(int letter, int number) {
     this->number = number;
 }
 
-Coordinate Coordinate::Decrement() {
-    return Coordinate(letter - 1, number - 1);
+Coordinate Coordinate::Decrement() const {
+    return {letter - 1, number - 1};
 }
 
 bool Coordinate::operator==(Coordinate &other) {
     return letter == other.letter && number == other.number;
 }
 
-Coordinate Coordinate::Increment() {
-    return Coordinate(letter + 1, number + 1);
+Coordinate Coordinate::Increment() const {
+    return {letter + 1, number + 1};
 }

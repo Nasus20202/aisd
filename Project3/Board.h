@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector.h"
+#include <vector>
 #include <istream>
 
 enum GameState {
@@ -13,8 +13,8 @@ enum GameState {
 
 struct Coordinate {
     int letter, number;
-    Coordinate Decrement();
-    Coordinate Increment();
+    Coordinate Decrement() const;
+    Coordinate Increment() const;
     Coordinate(int letter = 0, int number = 0);
     bool operator==(Coordinate &other);
     friend std::istream &operator>>(std::istream &is, Coordinate &c);
@@ -29,7 +29,7 @@ struct Command {
 class Board {
 private:
     int getIndex(Coordinate coordinate);
-    Vector<char> board;
+    std::vector<char> board;
 public:
     static const char blackPawn = 'B', whitePawn = 'W', emptyTile = '_';
 
@@ -58,9 +58,9 @@ public:
     bool MovePawns(Coordinate from, Coordinate to);
     bool IsInBounds(Coordinate coordinate);
     bool IsMoveValid(Coordinate from, Coordinate to);
-    Vector<Coordinate> GetNeighbours(Coordinate from);
+    std::vector<Coordinate> GetNeighbours(Coordinate from);
 
-    Vector<Vector<Coordinate>> GetStraightLines();
-    Vector<Vector<Coordinate>> GetLeftToRightDiagonalLines();
-    Vector<Vector<Coordinate>> GetRightToLeftDiagonalLines();
+    std::vector<std::vector<Coordinate>> GetStraightLines();
+    std::vector<std::vector<Coordinate>> GetLeftToRightDiagonalLines();
+    std::vector<std::vector<Coordinate>> GetRightToLeftDiagonalLines();
 };

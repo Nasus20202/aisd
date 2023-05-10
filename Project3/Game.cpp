@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "String.h"
 #include <iostream>
 
 using namespace std;
@@ -10,7 +9,7 @@ void Game::Run() {
 }
 
 void Game::Query() {
-    String input;
+    string input;
     cin >> input;
     if (input == "EXIT")
         exit = true;
@@ -24,7 +23,7 @@ void Game::Query() {
         PrintGameState();
     else if(input == "DO_MOVE")
         DoMove();
-    else if(input.size() > 0)
+    else if(!input.empty())
         cout << "Unknown command" << endl;
 }
 
@@ -60,30 +59,30 @@ void Game::PrintCoordinates() {
 
 void Game::PrintGameState() {
     board.PrintGameState();
-    Vector<Vector<Coordinate>> straight = board.GetStraightLines();
-    Vector<Vector<Coordinate>> leftToRight = board.GetLeftToRightDiagonalLines();
-    Vector<Vector<Coordinate>> rightToLeft = board.GetRightToLeftDiagonalLines();
+    vector<vector<Coordinate>> straight = board.GetStraightLines();
+    vector<vector<Coordinate>> leftToRight = board.GetLeftToRightDiagonalLines();
+    vector<vector<Coordinate>> rightToLeft = board.GetRightToLeftDiagonalLines();
 
     cout << "Straight lines: " << endl;
-    for(int i = 0; i < straight.size(); i++) {
-        for(int j = 0; j < straight[i].size(); j++) {
-            Coordinate c = straight[i][j].Increment();
+    for(auto & i : straight) {
+        for(int j = 0; j < i.size(); j++) {
+            Coordinate c = i[j].Increment();
             cout << c << " ";
         }
         cout << endl;
     }
     cout << "Left to right diagonal lines: " << endl;
-    for(int i = 0; i < leftToRight.size(); i++) {
-        for(int j = 0; j < leftToRight[i].size(); j++) {
-            Coordinate c = leftToRight[i][j].Increment();
+    for(auto & i : leftToRight) {
+        for(int j = 0; j < i.size(); j++) {
+            Coordinate c = i[j].Increment();
             cout << c << " ";
         }
         cout << endl;
     }
     cout << "Right to left diagonal lines: " << endl;
-    for(int i = 0; i < rightToLeft.size(); i++) {
-        for(int j = 0; j < rightToLeft[i].size(); j++) {
-            Coordinate c = rightToLeft[i][j].Increment();
+    for(auto & i : rightToLeft) {
+        for(int j = 0; j < i.size(); j++) {
+            Coordinate c = i[j].Increment();
             cout << c << " ";
         }
         cout << endl;
