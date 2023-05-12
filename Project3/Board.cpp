@@ -12,38 +12,39 @@ Board::Board(int boardSize, int pawnsToCollect, int blackStartingPawns, int whit
     this->blackPawns = blackPawns;
     this->whitePawns = whitePawns;
     this->currentPlayer = currentPlayer;
-    const int maxH = getMaxHeight();
+    const int maxH = GetMaxHeight();
     board.resize(maxH*maxH);
-    char c = emptyTile;
+    char c = emptyCode;
     for(int i = 0; i < maxH*maxH; i++)
         board.push_back(c);
 }
 
-void Board::setTile(Coordinate coordinate, char color) {
+void Board::SetTile(Coordinate coordinate, char color) {
     board[getIndex(coordinate)] = color;
 }
 
-char Board::getTile(Coordinate coordinate) {
+char Board::GetTile(Coordinate coordinate) const {
     return board[getIndex(coordinate)];
 }
 
 int Board::getIndex(Coordinate coordinate) const {
-    return coordinate.letter * getMaxHeight() + coordinate.number;
+    return coordinate.letter * GetMaxHeight() + coordinate.number;
 }
 
-int Board::getMaxHeight() const {
+int Board::GetMaxHeight() const {
     return 2 * size - 1;
 }
 
 void Board::LoadGameBoard() {
     int lineLength = size;
-    for(int letter = 0; letter < getMaxHeight(); letter++){
-        for(int number = 0; number < lineLength; number++){
+    vector<vector<Coordinate>> coordinates = GetStraightLines();
+    for(int line = 0; line < coordinates.size(); line++){
+        for(auto &coordinate : coordinates[line]){
             char c;
             cin >> c;
-            setTile(Coordinate(letter, number), c);
+            SetTile(coordinate, c);
         }
-        if(letter < size - 1)
+        if(line < size - 1)
             lineLength++;
         else
             lineLength--;
@@ -54,18 +55,17 @@ void Board::PrintBoard() {
     int lineLength = size;
     vector<vector<Coordinate>> coordinates = GetStraightLines();
     for(int line = 0; line < coordinates.size(); line++){
-        const int spaces = getMaxHeight() - lineLength;
+        const int spaces = GetMaxHeight() - lineLength;
         for(int i = 0; i < spaces; i++)
             cout << ' ';
         for(auto &coordinate : coordinates[line])
-            cout << getTile(coordinate) << ' ';
+            cout << GetTile(coordinate) << ' ';
         cout << endl;
         if(line < size - 1)
             lineLength++;
         else
             lineLength--;
     }
-    //vector<vector<Coordinate>>
 }
 
 void Board::PrintGameState() {
@@ -93,11 +93,11 @@ void Board::DoMove(Coordinate from, Coordinate to) {
     lastCommand.to = to.Increment();
     lastCommand.color = color;
     if(IsMoveValid(from, to) && MovePawns(from, to)) {
-        if (currentPlayer == blackPawn)
+        if (currentPlayer == blackCode)
             blackPawns--;
         else
             whitePawns--;
-        currentPlayer = (currentPlayer == blackPawn) ? whitePawn : blackPawn;
+        currentPlayer = (currentPlayer == blackCode) ? whiteCode : blackCode;
     }
     else {
         gameState = BadMove;
@@ -156,26 +156,26 @@ bool Board::IsMoveValid(Coordinate from, Coordinate to) {
 bool Board::MovePawns(Coordinate from, Coordinate to) {
     if(!IsInBounds(to))
         return false;
-    char toColor = getTile(to);
+    char toColor = GetTile(to);
     bool isOk = true;
-    if(toColor != emptyTile)
+    if(toColor != emptyCode)
         isOk = MovePawns(to, NextCoordinate(from, to));
     char fromColor = currentPlayer;
     if(IsInBounds(from)) {
-        fromColor = getTile(from);
-        setTile(from, emptyTile);
+        fromColor = GetTile(from);
+        SetTile(from, emptyCode);
     }
-    setTile(to, fromColor);
+    SetTile(to, fromColor);
     return isOk;
 }
 
 bool Board::IsInBounds(Coordinate coordinate) const {
-    if(coordinate.letter < 0 || coordinate.letter >= getMaxHeight())
+    if(coordinate.letter < 0 || coordinate.letter >= GetMaxHeight())
         return false;
     int distanceFromCenter = coordinate.letter - (size - 1);
     if(distanceFromCenter < 0)
         distanceFromCenter *= -1;
-    int maxNumber = getMaxHeight() - distanceFromCenter - 1;
+    int maxNumber = GetMaxHeight() - distanceFromCenter - 1;
     if(coordinate.number < 0 || coordinate.number > maxNumber)
         return false;
     return true;
@@ -238,7 +238,7 @@ Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) const {
 
 vector<vector<Coordinate>> Board::GetUpLines() const {
     vector<vector<Coordinate>> lines;
-    for(int i = 0; i < getMaxHeight(); i++){
+    for(int i = 0; i < GetMaxHeight(); i++){
         Coordinate from(i, -1);
         Coordinate to(i, 0);
         vector<Coordinate> line;
@@ -311,6 +311,51 @@ vector<vector<Coordinate>> Board::GetDownLines() const {
     return lines;
 }
 
+vector<vector<Coordinate>> Board::GetLines() const {
+    vector<vector<Coordinate>> lines, upLines = GetUpLines(), straightLines = GetStraightLines(), downLines = GetDownLines();
+    lines.insert(lines.end(), upLines.begin(), upLines.end());
+    lines.insert(lines.end(), straightLines.begin(), straightLines.end());
+    lines.insert(lines.end(), downLines.begin(), downLines.end());
+    return lines;
+}
+
+vector<vector<Coordinate>> Board::GetCaptureLines() const {
+    vector<vector<Coordinate>> captureLines;
+    vector<vector<Coordinate>> lines = GetLines();
+    for(auto &line : lines){
+        vector<Coordinate> currentCaptureLine;
+        int currentWhite = 0, currentBlack = 0;
+        for(auto &coordinate : line){
+            char currentColor = GetTile(coordinate);
+            currentCaptureLine.push_back(coordinate);
+            if(currentColor == whiteCode){
+                currentWhite++;
+                currentBlack = 0;
+                if(currentBlack >= pawnsToCollect)
+                    captureLines.push_back(currentCaptureLine);
+            } else if(currentColor == blackCode){
+                currentWhite = 0;
+                currentBlack++;
+                if(currentWhite >= pawnsToCollect)
+                    captureLines.push_back(currentCaptureLine);
+            } else {
+                currentWhite = 0;
+                currentBlack = 0;
+                if(currentWhite >= pawnsToCollect || currentBlack >= pawnsToCollect)
+                    captureLines.push_back(currentCaptureLine);
+            }
+        }
+        if(currentWhite >= pawnsToCollect || currentBlack >= pawnsToCollect)
+            captureLines.push_back(currentCaptureLine);
+    }
+    for(auto &cLine : captureLines){
+        for(auto &c : cLine){
+            cout << c << " ";
+        }
+        cout << endl;
+    }
+    return captureLines;
+}
 
 std::ostream &operator<<(ostream &os, Coordinate &c) {
     os << (char)('A' + c.letter) << c.number + 1;
@@ -322,13 +367,14 @@ std::istream &operator>>(istream &is, Coordinate &c) {
     int number = 0;
     char input;
     while(is >> input){
+        const int size = 26;
         if(input >= 'A' && input <= 'Z'){
             input -= 'A';
-            letter = letter * 10 + input;
+            letter = letter * size + input;
         }
         else if(input >= 'a' && input <= 'z'){
             input -= 'a';
-            letter = letter * 10 + input;
+            letter = letter * size + input;
         } else {
             is.putback(input);
             break;

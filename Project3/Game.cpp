@@ -42,10 +42,10 @@ void Game::PrintGameBoard() {
 void Game::PrintCoordinates() {
     int lineLength = board.size;
     // temp board that is used to get the coordinates, it's size+1 to show coordinates outside the board
-    Board temp(lineLength+1, 0, 0, 0, 0, 0, ' ');
+    Board temp(lineLength+1);
     vector<vector<Coordinate>> coordinates = temp.GetStraightLines();
     for(int line = 0; line < coordinates.size(); line++){
-        const int spaces = board.getMaxHeight() - lineLength+1;
+        const int spaces = board.GetMaxHeight() - lineLength + 1;
         for(int i = 0; i < spaces; i++)
             cout << "  ";
         for(auto &coordinate : coordinates[line])
@@ -67,6 +67,7 @@ void Game::DoMove() {
     cin >> from >> to;
     Board tempBoard = board;
     tempBoard.DoMove(from.Decrement(), to.Decrement()); // Decrementing to match the indexing of the board
+    tempBoard.GetCaptureLines();
     if(board.gameState == InProgress)
         board.lastCommand = tempBoard.lastCommand;
     board.gameState = tempBoard.gameState;
