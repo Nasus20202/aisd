@@ -40,9 +40,9 @@ void Board::LoadGameBoard() {
     vector<vector<Coordinate>> coordinates = GetStraightLines();
     for(int line = 0; line < coordinates.size(); line++){
         for(auto &coordinate : coordinates[line]){
-            char c;
-            cin >> c;
-            SetTile(coordinate, c);
+            char color;
+            cin >> color;
+            SetTile(coordinate, color);
         }
         if(line < size - 1)
             lineLength++;
@@ -329,20 +329,23 @@ vector<vector<Coordinate>> Board::GetCaptureLines() const {
             char currentColor = GetTile(coordinate);
             currentCaptureLine.push_back(coordinate);
             if(currentColor == whiteCode){
-                currentWhite++;
-                currentBlack = 0;
                 if(currentBlack >= pawnsToCollect)
                     captureLines.push_back(currentCaptureLine);
+                currentCaptureLine.clear();
+                currentWhite++;
+                currentBlack = 0;
             } else if(currentColor == blackCode){
-                currentWhite = 0;
-                currentBlack++;
                 if(currentWhite >= pawnsToCollect)
                     captureLines.push_back(currentCaptureLine);
-            } else {
+                currentCaptureLine.clear();
                 currentWhite = 0;
-                currentBlack = 0;
+                currentBlack++;
+            } else {
                 if(currentWhite >= pawnsToCollect || currentBlack >= pawnsToCollect)
                     captureLines.push_back(currentCaptureLine);
+                currentCaptureLine.clear();
+                currentWhite = 0;
+                currentBlack = 0;
             }
         }
         if(currentWhite >= pawnsToCollect || currentBlack >= pawnsToCollect)
@@ -358,7 +361,16 @@ vector<vector<Coordinate>> Board::GetCaptureLines() const {
 }
 
 std::ostream &operator<<(ostream &os, Coordinate &c) {
-    os << (char)('A' + c.letter) << c.number + 1;
+    const int size = 26;
+    string s;
+    int letter = c.letter;
+    while(letter >= 0){
+        s +=  char(letter % size + 'A');
+        letter /= size;
+        letter--;
+    }
+    reverse(s.begin(), s.end());
+    os << s << c.number + 1;
     return os;
 }
 
@@ -370,18 +382,18 @@ std::istream &operator>>(istream &is, Coordinate &c) {
         const int size = 26;
         if(input >= 'A' && input <= 'Z'){
             input -= 'A';
-            letter = letter * size + input;
+            letter = letter * size + input+1;
         }
         else if(input >= 'a' && input <= 'z'){
             input -= 'a';
-            letter = letter * size + input;
+            letter = letter * size + input+1;
         } else {
             is.putback(input);
             break;
         }
     }
     is >> number;
-    c.letter = letter;
+    c.letter = letter - 1;
     c.number = number - 1;
     return is;
 }
@@ -395,10 +407,11 @@ Coordinate Coordinate::Decrement() const {
     return Coordinate(letter - 1, number - 1);
 }
 
+Coordinate Coordinate::Increment() const {
+    return Coordinate(letter + 1, number + 1);
+}
+
 bool Coordinate::operator==(Coordinate &other) const {
     return letter == other.letter && number == other.number;
 }
 
-Coordinate Coordinate::Increment() const {
-    return Coordinate(letter + 1, number + 1);
-}
