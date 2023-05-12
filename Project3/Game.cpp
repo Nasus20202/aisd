@@ -41,16 +41,17 @@ void Game::PrintGameBoard() {
 
 void Game::PrintCoordinates() {
     int lineLength = board.size;
-    for(int letter = 0; letter <= board.getMaxHeight() + 1; letter++){
+    // temp board that is used to get the coordinates, it's size+1 to show coordinates outside the board
+    Board temp(lineLength+1, 0, 0, 0, 0, 0, ' ');
+    vector<vector<Coordinate>> coordinates = temp.GetStraightLines();
+    for(int line = 0; line < coordinates.size(); line++){
         const int spaces = board.getMaxHeight() - lineLength+1;
         for(int i = 0; i < spaces; i++)
             cout << "  ";
-        for(int number = 0; number <= lineLength; number++) {
-            Coordinate coordinate(letter, number);
+        for(auto &coordinate : coordinates[line])
             cout << coordinate << "  ";
-        }
         cout << endl;
-        if(letter < board.size)
+        if(line < board.size)
             lineLength++;
         else
             lineLength--;
@@ -59,35 +60,6 @@ void Game::PrintCoordinates() {
 
 void Game::PrintGameState() {
     board.PrintGameState();
-    vector<vector<Coordinate>> straight = board.GetStraightLines();
-    vector<vector<Coordinate>> leftToRight = board.GetLeftToRightDiagonalLines();
-    vector<vector<Coordinate>> rightToLeft = board.GetRightToLeftDiagonalLines();
-
-    cout << "Straight lines: " << endl;
-    for(auto & i : straight) {
-        for(int j = 0; j < i.size(); j++) {
-            Coordinate c = i[j].Increment();
-            cout << c << " ";
-        }
-        cout << endl;
-    }
-    cout << "Left to right diagonal lines: " << endl;
-    for(auto & i : leftToRight) {
-        for(int j = 0; j < i.size(); j++) {
-            Coordinate c = i[j].Increment();
-            cout << c << " ";
-        }
-        cout << endl;
-    }
-    cout << "Right to left diagonal lines: " << endl;
-    for(auto & i : rightToLeft) {
-        for(int j = 0; j < i.size(); j++) {
-            Coordinate c = i[j].Increment();
-            cout << c << " ";
-        }
-        cout << endl;
-    }
-
 }
 
 void Game::DoMove() {

@@ -13,10 +13,10 @@ enum GameState {
 
 struct Coordinate {
     int letter, number;
-    Coordinate Decrement() const;
-    Coordinate Increment() const;
-    Coordinate(int letter = 0, int number = 0);
-    bool operator==(Coordinate &other);
+    [[nodiscard]] Coordinate Decrement() const;
+    [[nodiscard]] Coordinate Increment() const;
+    explicit Coordinate(int letter = 0, int number = 0);
+    bool operator==(Coordinate &other) const;
     friend std::istream &operator>>(std::istream &is, Coordinate &c);
     friend std::ostream &operator<<(std::ostream &os, Coordinate &c);
 };
@@ -28,7 +28,7 @@ struct Command {
 
 class Board {
 private:
-    int getIndex(Coordinate coordinate);
+    [[nodiscard]] int getIndex(Coordinate coordinate) const;
     std::vector<char> board;
 public:
     static const char blackPawn = 'B', whitePawn = 'W', emptyTile = '_';
@@ -43,10 +43,10 @@ public:
     GameState gameState = InProgress;
     Command lastCommand;
 
-    Board(int boardSize = 4, int pawnsToCollect =  4, int blackStartingPawns = 15, int whiteStartingPawns = 15, int blackPawns = 12, int whitePawns = 12, char currentPlayer = whitePawn);
+    explicit Board(int boardSize = 4, int pawnsToCollect =  4, int blackStartingPawns = 15, int whiteStartingPawns = 15, int blackPawns = 12, int whitePawns = 12, char currentPlayer = whitePawn);
     void setTile(Coordinate coordinate, char color);
     char getTile(Coordinate coordinate);
-    int getMaxHeight();
+    [[nodiscard]] int getMaxHeight() const;
 
     void DoMove(Coordinate from, Coordinate to);
 
@@ -54,13 +54,13 @@ public:
     void PrintGameState();
     void LoadGameBoard();
 
-    Coordinate NextCoordinate(Coordinate from, Coordinate to);
+    [[nodiscard]] Coordinate NextCoordinate(Coordinate from, Coordinate to) const;
     bool MovePawns(Coordinate from, Coordinate to);
-    bool IsInBounds(Coordinate coordinate);
+    [[nodiscard]] bool IsInBounds(Coordinate coordinate) const;
     bool IsMoveValid(Coordinate from, Coordinate to);
     std::vector<Coordinate> GetNeighbours(Coordinate from);
 
-    std::vector<std::vector<Coordinate>> GetStraightLines();
-    std::vector<std::vector<Coordinate>> GetLeftToRightDiagonalLines();
-    std::vector<std::vector<Coordinate>> GetRightToLeftDiagonalLines();
+    [[nodiscard]] std::vector<std::vector<Coordinate>> GetUpLines() const;
+    [[nodiscard]] std::vector<std::vector<Coordinate>> GetStraightLines() const;
+    [[nodiscard]] std::vector<std::vector<Coordinate>> GetDownLines() const;
 };

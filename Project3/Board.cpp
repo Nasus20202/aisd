@@ -27,11 +27,11 @@ char Board::getTile(Coordinate coordinate) {
     return board[getIndex(coordinate)];
 }
 
-int Board::getIndex(Coordinate coordinate) {
+int Board::getIndex(Coordinate coordinate) const {
     return coordinate.letter * getMaxHeight() + coordinate.number;
 }
 
-int Board::getMaxHeight() {
+int Board::getMaxHeight() const {
     return 2 * size - 1;
 }
 
@@ -52,19 +52,20 @@ void Board::LoadGameBoard() {
 
 void Board::PrintBoard() {
     int lineLength = size;
-    for(int letter = 0; letter < getMaxHeight(); letter++){
+    vector<vector<Coordinate>> coordinates = GetStraightLines();
+    for(int line = 0; line < coordinates.size(); line++){
         const int spaces = getMaxHeight() - lineLength;
         for(int i = 0; i < spaces; i++)
             cout << ' ';
-        for(int number = 0; number < lineLength; number++){
-            cout << getTile(Coordinate(letter, number)) << ' ';
-        }
+        for(auto &coordinate : coordinates[line])
+            cout << getTile(coordinate) << ' ';
         cout << endl;
-        if(letter < size - 1)
+        if(line < size - 1)
             lineLength++;
         else
             lineLength--;
     }
+    //vector<vector<Coordinate>>
 }
 
 void Board::PrintGameState() {
@@ -168,7 +169,7 @@ bool Board::MovePawns(Coordinate from, Coordinate to) {
     return isOk;
 }
 
-bool Board::IsInBounds(Coordinate coordinate) {
+bool Board::IsInBounds(Coordinate coordinate) const {
     if(coordinate.letter < 0 || coordinate.letter >= getMaxHeight())
         return false;
     int distanceFromCenter = coordinate.letter - (size - 1);
@@ -180,7 +181,7 @@ bool Board::IsInBounds(Coordinate coordinate) {
     return true;
 }
 
-Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) {
+Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) const {
     int nextLetter = 2*to.letter-from.letter, nextNumber = 0;
     // Calculate next number based on the direction
     if(from.letter == to.letter) // same level
@@ -235,7 +236,7 @@ Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) {
 }
 
 
-vector<vector<Coordinate>> Board::GetStraightLines() {
+vector<vector<Coordinate>> Board::GetUpLines() const {
     vector<vector<Coordinate>> lines;
     for(int i = 0; i < getMaxHeight(); i++){
         Coordinate from(i, -1);
@@ -252,7 +253,7 @@ vector<vector<Coordinate>> Board::GetStraightLines() {
     return lines;
 }
 
-vector<vector<Coordinate>> Board::GetLeftToRightDiagonalLines() {
+vector<vector<Coordinate>> Board::GetStraightLines() const {
     vector<vector<Coordinate>> lines;
     for(int i = size-1; i > 0; i--){
         Coordinate from(-1, i-1);
@@ -281,7 +282,7 @@ vector<vector<Coordinate>> Board::GetLeftToRightDiagonalLines() {
     return lines;
 }
 
-vector<vector<Coordinate>> Board::GetRightToLeftDiagonalLines() {
+vector<vector<Coordinate>> Board::GetDownLines() const {
     vector<vector<Coordinate>> lines;
     for(int i = 0; i < size; i++){
         Coordinate from(-1, i);
@@ -345,13 +346,13 @@ Coordinate::Coordinate(int letter, int number) {
 }
 
 Coordinate Coordinate::Decrement() const {
-    return {letter - 1, number - 1};
+    return Coordinate(letter - 1, number - 1);
 }
 
-bool Coordinate::operator==(Coordinate &other) {
+bool Coordinate::operator==(Coordinate &other) const {
     return letter == other.letter && number == other.number;
 }
 
 Coordinate Coordinate::Increment() const {
-    return {letter + 1, number + 1};
+    return Coordinate(letter + 1, number + 1);
 }
