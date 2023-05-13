@@ -51,7 +51,7 @@ void Board::LoadGameBoard() {
     }
 }
 
-void Board::PrintBoard() {
+void Board::PrintBoard() const{
     int lineLength = size;
     vector<vector<Coordinate>> coordinates = GetStraightLines();
     for(int line = 0; line < coordinates.size(); line++){
@@ -68,7 +68,7 @@ void Board::PrintBoard() {
     }
 }
 
-void Board::PrintGameState() {
+void Board::PrintGameState() const {
     switch (gameState) {
         case InProgress:
             cout << "in_progress" << endl;
@@ -87,7 +87,7 @@ void Board::PrintGameState() {
     }
 }
 
-void Board::DoMove(Coordinate from, Coordinate to) {
+void Board::PushPawns(Coordinate from, Coordinate to) {
     char color = currentPlayer;
     lastCommand.from = from.Increment();
     lastCommand.to = to.Increment();
@@ -103,6 +103,18 @@ void Board::DoMove(Coordinate from, Coordinate to) {
         gameState = BadMove;
         return;
     }
+}
+
+
+void Board::DoMove(Coordinate from, Coordinate to) {
+    Board tempBoard = *this;
+    tempBoard.PushPawns(from.Decrement(), to.Decrement()); // Decrementing to match the indexing of the board
+    if(gameState == InProgress)
+        lastCommand = tempBoard.lastCommand;
+    gameState = tempBoard.gameState;
+    if(gameState != InProgress)
+        return;
+    *this = tempBoard;
 }
 
 vector<Coordinate> Board::GetNeighbours(Coordinate from) {
@@ -236,7 +248,7 @@ Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) const {
 }
 
 
-vector<vector<Coordinate>> Board::GetUpLines() const {
+vector<Board::CoordinateLine> Board::GetUpLines() const {
     vector<vector<Coordinate>> lines;
     for(int i = 0; i < GetMaxHeight(); i++){
         Coordinate from(i, -1);
@@ -253,7 +265,7 @@ vector<vector<Coordinate>> Board::GetUpLines() const {
     return lines;
 }
 
-vector<vector<Coordinate>> Board::GetStraightLines() const {
+vector<Board::CoordinateLine> Board::GetStraightLines() const {
     vector<vector<Coordinate>> lines;
     for(int i = size-1; i > 0; i--){
         Coordinate from(-1, i-1);
@@ -282,7 +294,7 @@ vector<vector<Coordinate>> Board::GetStraightLines() const {
     return lines;
 }
 
-vector<vector<Coordinate>> Board::GetDownLines() const {
+vector<Board::CoordinateLine> Board::GetDownLines() const {
     vector<vector<Coordinate>> lines;
     for(int i = 0; i < size; i++){
         Coordinate from(-1, i);
@@ -311,7 +323,7 @@ vector<vector<Coordinate>> Board::GetDownLines() const {
     return lines;
 }
 
-vector<vector<Coordinate>> Board::GetLines() const {
+vector<Board::CoordinateLine> Board::GetLines() const {
     vector<vector<Coordinate>> lines, upLines = GetUpLines(), straightLines = GetStraightLines(), downLines = GetDownLines();
     lines.insert(lines.end(), upLines.begin(), upLines.end());
     lines.insert(lines.end(), straightLines.begin(), straightLines.end());
@@ -319,48 +331,114 @@ vector<vector<Coordinate>> Board::GetLines() const {
     return lines;
 }
 
-vector<vector<Coordinate>> Board::GetCaptureLines() const {
+vector<Board::CoordinateLine> Board::GetCaptureLines() const {
     vector<vector<Coordinate>> captureLines;
     vector<vector<Coordinate>> lines = GetLines();
     for(auto &line : lines){
         vector<Coordinate> currentCaptureLine;
-        int currentWhite = 0, currentBlack = 0;
+        int currentWhite = 0, currentBlack = 0; bool isCaptureLine = false;
         for(auto &coordinate : line){
             char currentColor = GetTile(coordinate);
-            currentCaptureLine.push_back(coordinate);
-            if(currentColor == whiteCode){
-                if(currentBlack >= pawnsToCollect)
-                    captureLines.push_back(currentCaptureLine);
-                currentCaptureLine.clear();
+            if(currentColor != emptyCode)
+                currentCaptureLine.push_back(coordinate);
+            if(currentColor == whiteCode)
                 currentWhite++;
-                currentBlack = 0;
-            } else if(currentColor == blackCode){
-                if(currentWhite >= pawnsToCollect)
-                    captureLines.push_back(currentCaptureLine);
-                currentCaptureLine.clear();
+            else
                 currentWhite = 0;
+            if(currentColor == blackCode)
                 currentBlack++;
-            } else {
-                if(currentWhite >= pawnsToCollect || currentBlack >= pawnsToCollect)
-                    captureLines.push_back(currentCaptureLine);
-                currentCaptureLine.clear();
-                currentWhite = 0;
+            else
                 currentBlack = 0;
+            if(currentWhite >= pawnsToCollect || currentBlack >= pawnsToCollect)
+                isCaptureLine = true;
+            if(currentColor == emptyCode){
+                if(isCaptureLine){
+                    captureLines.push_back(currentCaptureLine);
+                }
+                currentCaptureLine.clear();
+                isCaptureLine = false;
             }
         }
-        if(currentWhite >= pawnsToCollect || currentBlack >= pawnsToCollect)
+        if(isCaptureLine)
             captureLines.push_back(currentCaptureLine);
-    }
-    for(auto &cLine : captureLines){
-        for(auto &c : cLine){
-            cout << c << " ";
-        }
-        cout << endl;
     }
     return captureLines;
 }
 
-std::ostream &operator<<(ostream &os, Coordinate &c) {
+void Board::RemovePawn(Coordinate coordinate) {
+    char color = GetTile(coordinate);
+    if(color == currentPlayer){
+        if(color == whiteCode)
+            whitePawns++;
+        else
+            blackPawns++;
+    }
+    SetTile(coordinate, emptyCode);
+}
+
+vector<vector<int>> Board::GetCaptureLinesCount() {
+    vector<vector<int>> captureLinesCount(GetMaxHeight(), vector<int>(GetMaxHeight(), 0));
+    vector<vector<Coordinate>> captureLines = GetCaptureLines();
+    for(auto &line : captureLines){
+        for(auto &coordinate : line){
+            captureLinesCount[coordinate.letter][coordinate.number]++;
+        }
+    }
+    return captureLinesCount;
+}
+
+int Board::MaxCaptureLines() {
+    int max = 0;
+    vector<vector<int>> captureLinesCount = GetCaptureLinesCount();
+    for(auto &line : captureLinesCount){
+        for(auto &count : line){
+            if(count > max)
+                max = count;
+        }
+    }
+    return max;
+}
+
+unordered_set<Board> Board::PossibleBoardsAfterCapture() {
+    auto compare = [](const Board &b1, const Board &b2) { return b1 == b2; };
+    unordered_set<Board> boards;
+    vector<Board::CoordinateLine> captureLines = GetCaptureLines();
+    const int maxHeight = GetMaxHeight();
+    vector<vector<Board::CoordinateLine*>> captureLinesPerTile(maxHeight*maxHeight, vector<Board::CoordinateLine*>());
+    for(auto &line : captureLines){
+        for(auto &coordinate : line){
+            captureLinesPerTile[coordinate.letter*maxHeight+ coordinate.number].push_back(&line);
+        }
+    }
+    for(int i = 0; i < maxHeight; i++){
+        for(int j = 0; j < maxHeight; j++){
+            if(captureLinesPerTile[i*maxHeight+j].size() > 0){
+                Board board = *this;
+                board.RemovePawn(Coordinate(i, j));
+                boards.insert(board);
+            }
+        }
+    }
+    return boards;
+}
+
+bool Board::operator==(const Board &other) const {
+    if(this->board != other.board)
+        return false;
+    if(this->currentPlayer != other.currentPlayer)
+        return false;
+    if(this->whitePawns != other.whitePawns || this->blackPawns != other.blackPawns)
+        return false;
+    if(this->whiteStartingPawns != other.whiteStartingPawns || this->blackStartingPawns != other.blackStartingPawns)
+        return false;
+    if(this->size != other.size || this->pawnsToCollect != other.pawnsToCollect)
+        return false;
+    if(this->gameState != other.gameState)
+        return false;
+    return true;
+}
+
+std::ostream &operator<<(ostream &os, const Coordinate &c) {
     const int size = 26;
     string s;
     int letter = c.letter;
@@ -414,4 +492,3 @@ Coordinate Coordinate::Increment() const {
 bool Coordinate::operator==(Coordinate &other) const {
     return letter == other.letter && number == other.number;
 }
-

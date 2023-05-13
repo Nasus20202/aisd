@@ -11,6 +11,9 @@ void Game::Run() {
 void Game::Query() {
     string input;
     cin >> input;
+    for(char &c : input)
+        c = (char) toupper(c);
+
     if (input == "EXIT")
         exit = true;
     else if(input == "LOAD_GAME_BOARD")
@@ -65,12 +68,10 @@ void Game::PrintGameState() {
 void Game::DoMove() {
     Coordinate from, to;
     cin >> from >> to;
-    Board tempBoard = board;
-    tempBoard.DoMove(from.Decrement(), to.Decrement()); // Decrementing to match the indexing of the board
-    tempBoard.GetCaptureLines();
-    if(board.gameState == InProgress)
-        board.lastCommand = tempBoard.lastCommand;
-    board.gameState = tempBoard.gameState;
-    if(board.gameState == InProgress)
-        board = tempBoard;
+    board.DoMove(from, to);
+    unordered_set<Board> possibleBoards = board.PossibleBoardsAfterCapture();
+    cout << "Possible boards after capture:" << endl;
+    for(auto &possibleBoard : possibleBoards)
+        possibleBoard.PrintBoard();
+
 }
