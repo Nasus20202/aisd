@@ -66,6 +66,7 @@ void Board::PrintBoard() const{
         else
             lineLength--;
     }
+    cout << endl;
 }
 
 void Board::PrintGameState() const {
@@ -410,14 +411,12 @@ unordered_set<Board> Board::PossibleBoardsAfterCapture() {
             captureLinesPerTile[coordinate.letter*maxHeight+ coordinate.number].push_back(&line);
         }
     }
-    for(int i = 0; i < maxHeight; i++){
-        for(int j = 0; j < maxHeight; j++){
-            if(captureLinesPerTile[i*maxHeight+j].size() > 0){
-                Board board = *this;
-                board.RemovePawn(Coordinate(i, j));
-                boards.insert(board);
-            }
+    for(auto &line : captureLines){
+        Board board = *this;
+        for(auto &coordinate : line){
+            board.RemovePawn(coordinate);
         }
+        boards.insert(board);
     }
     return boards;
 }
