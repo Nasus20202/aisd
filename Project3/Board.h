@@ -37,7 +37,7 @@ public:
     struct CaptureLine {
         CoordinateLine coordinates;
         char color;
-        CaptureLine(CoordinateLine  coordinates, char color);
+        CaptureLine(const Board::CoordinateLine &coordinates, char color);
     };
 
     static const char blackCode = 'B', whiteCode = 'W', emptyCode = '_';

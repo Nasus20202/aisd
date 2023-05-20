@@ -86,6 +86,9 @@ void Board::LoadGameBoard() {
         gameState = InvalidInput;
         return;
     }
+    // If any capture is possible, do first one
+    unordered_set<Board> boards = PossibleBoardsAfterCapture();
+    *this = *boards.begin();
     cout << "BOARD_STATE_OK" << endl;
 }
 
@@ -543,4 +546,4 @@ bool Coordinate::operator==(Coordinate &other) const {
     return letter == other.letter && number == other.number;
 }
 
-Board::CaptureLine::CaptureLine(Board::CoordinateLine coordinates, char color) : coordinates(std::move(coordinates)), color(color) {}
+Board::CaptureLine::CaptureLine(const Board::CoordinateLine &coordinates, char color) : coordinates(coordinates), color(color) {}
