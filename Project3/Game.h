@@ -7,13 +7,13 @@ private:
     Board board;
 
     void LoadGameBoard();
-    void PrintGameBoard();
-    void PrintCoordinates();
+    void PrintGameBoard() const;
+    void PrintCoordinates() const;
+    void PrintGameState() const;
     void Query();
-public:
-    void Run();
-
-    void PrintGameState();
 
     void DoMove();
+    Board RemoveCapturedPawns(Board& nextBoard);
+public:
+    void Run();
 };

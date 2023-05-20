@@ -41,7 +41,7 @@ void Board::LoadGameBoard() {
     int lineLength = size; blackPawnsOnBoard = 0; whitePawnsOnBoard = 0;
     vector<vector<Coordinate>> coordinates = GetStraightLines();
     int rows = 0;
-    for(int line = 0; line < coordinates.size(); line++){
+    for(int line = 0; line < int(coordinates.size()); line++){
         int columns = 0;
         char color = ' '; bool tooLong = false;
         while(color == ' ' || color == '\n')
@@ -75,12 +75,26 @@ void Board::LoadGameBoard() {
         else
             lineLength--;
     }
+    bool rightNumberOfPawns = true;
+    if(whitePawns + whitePawnsOnBoard != whiteStartingPawns) {
+        cout << "WRONG_WHITE_PAWNS_NUMBER" << endl; rightNumberOfPawns = false;
+    }
+    else if(blackPawns + blackPawnsOnBoard != blackStartingPawns) {
+        cout << "WRONG_BLACK_PAWNS_NUMBER" << endl; rightNumberOfPawns = false;
+    }
+    if(!rightNumberOfPawns) {
+        gameState = InvalidInput;
+        return;
+    }
+    cout << "BOARD_STATE_OK" << endl;
 }
 
 void Board::PrintBoard() const{
+    cout << size << " " << pawnsToCollect << " " << whiteStartingPawns << " " << blackStartingPawns << endl;
+    cout << whitePawns << " " << blackPawns << " " << currentPlayer << endl;
     int lineLength = size;
     vector<vector<Coordinate>> coordinates = GetStraightLines();
-    for(int line = 0; line < coordinates.size(); line++){
+    for(int line = 0; line < int(coordinates.size()); line++){
         const int spaces = GetMaxHeight() - lineLength;
         for(int i = 0; i < spaces; i++)
             cout << ' ';
@@ -92,7 +106,6 @@ void Board::PrintBoard() const{
         else
             lineLength--;
     }
-    cout << endl;
 }
 
 void Board::PrintGameState() const {
@@ -397,6 +410,7 @@ vector<Board::CaptureLine> Board::GetCaptureLines() const {
                 }
                 currentCaptureLine.clear();
                 isCaptureLine = false;
+                color = emptyCode;
             }
         }
         if(isCaptureLine)
@@ -420,29 +434,6 @@ void Board::RemovePawn(Coordinate coordinate, char lineColor) {
     else if(tileColor == blackCode)
         blackPawnsOnBoard--;
     SetTile(coordinate, emptyCode);
-}
-
-vector<vector<int>> Board::GetCaptureLinesCount() const {
-    vector<vector<int>> captureLinesCount(GetMaxHeight(), vector<int>(GetMaxHeight(), 0));
-    vector<CaptureLine> captureLines = GetCaptureLines();
-    for(auto &line : captureLines){
-        for(auto &coordinate : line.coordinates){
-            captureLinesCount[coordinate.letter][coordinate.number]++;
-        }
-    }
-    return captureLinesCount;
-}
-
-int Board::MaxCaptureLines() {
-    int max = 0;
-    vector<vector<int>> captureLinesCount = GetCaptureLinesCount();
-    for(auto &line : captureLinesCount){
-        for(auto &count : line){
-            if(count > max)
-                max = count;
-        }
-    }
-    return max;
 }
 
 unordered_set<Board> Board::PossibleBoardsAfterCapture() {
@@ -542,7 +533,4 @@ bool Coordinate::operator==(Coordinate &other) const {
     return letter == other.letter && number == other.number;
 }
 
-Board::CaptureLine::CaptureLine(Board::CoordinateLine coordinates, char color) {
-    this->coordinates = std::move(coordinates);
-    this->color = color;
-}
+Board::CaptureLine::CaptureLine(const Board::CoordinateLine& coordinates, char color) : coordinates(coordinates), color(color) {}

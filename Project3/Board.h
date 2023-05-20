@@ -2,7 +2,6 @@
 #include <vector>
 #include <unordered_set>
 #include <istream>
-#include <functional>
 
 enum GameState {
     InProgress,
@@ -38,7 +37,7 @@ public:
     struct CaptureLine {
         CoordinateLine coordinates;
         char color;
-        CaptureLine(CoordinateLine coordinates, char color);
+        CaptureLine(const CoordinateLine& coordinates, char color);
     };
 
     static const char blackCode = 'B', whiteCode = 'W', emptyCode = '_';
@@ -76,9 +75,6 @@ public:
     bool IsMoveValid(Coordinate from, Coordinate to) const;
     void RemovePawn(Coordinate coordinate, char lineColor = emptyCode);
     void RemoveCaptureLine(const Board::CaptureLine &captureLine);
-    int MaxCaptureLines(); // returns the maximum number of capture lines a pawn is in
-    [[nodiscard]] std::vector<std::vector<int>> GetCaptureLinesCount() const; // returns in how many capture lines each pawn is in
-
 
     [[nodiscard]] std::vector<Coordinate> GetNeighbours(Coordinate from) const;
     // Generate all possible straight lines on the board
