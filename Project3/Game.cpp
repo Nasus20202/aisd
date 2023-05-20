@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Solver.h"
 #include <iostream>
 #include <string>
 
@@ -19,6 +20,12 @@ void Game::Query() {
 
     if (input == "EXIT")
         exit = true;
+    else if(input == "BREAK") {
+        string line;
+        for(int i = 0; i < 50; i++)
+            line += "-";
+        cout << line << endl;
+    }
     else if(input == "LOAD_GAME_BOARD")
         LoadGameBoard();
     else if(input == "PRINT_GAME_BOARD") {
@@ -30,6 +37,14 @@ void Game::Query() {
         PrintGameState();
     else if(input == "DO_MOVE")
         DoMove();
+    else if(input == "GEN_ALL_POS_MOV")
+        GenerateAllPossibleMoves();
+    else if(input == "GEN_ALL_POS_MOV_EXT")
+        GenerateAllPossibleMovesExtended();
+    else if(input == "GEN_ALL_POS_MOV_NUM")
+        GenerateAllPossibleMovesNumber();
+    else if(input == "GEN_ALL_POS_MOV_NUM_EXT")
+        GenerateAllPossibleMovesNumberExtended();
 }
 
 void Game::LoadGameBoard() {
@@ -122,5 +137,50 @@ Board Game::RemoveCapturedPawns(Board &nextBoard) {
     }
     nextBoard.RemoveCaptureLine(Board::CaptureLine(coordinates, color));
     return RemoveCapturedPawns(nextBoard);
+}
+
+void Game::GenerateAllPossibleMoves() {
+    Solver solver(board);
+    unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
+    int i = 0;
+    for(auto& currentBoard : possibleMoves){
+        cout << ++i << '.' << endl;
+        currentBoard.PrintBoard();
+    }
+}
+
+void Game::GenerateAllPossibleMovesExtended() {
+    Solver solver(board);
+    unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
+    for(auto& currentBoard : possibleMoves){
+        if(currentBoard.gameState == GameState::BlackWon || currentBoard.gameState == GameState::WhiteWon){
+            currentBoard.PrintBoard();
+            currentBoard.PrintGameState();
+            return;
+        }
+    }
+    int i = 0;
+    for(auto& currentBoard : possibleMoves){
+        cout << ++i << '.' << endl;
+        currentBoard.PrintBoard();
+    }
+}
+
+void Game::GenerateAllPossibleMovesNumber() {
+    Solver solver(board);
+    unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
+    cout << possibleMoves.size() << endl;
+}
+
+void Game::GenerateAllPossibleMovesNumberExtended() {
+    Solver solver(board);
+    unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
+    for(auto& currentBoard : possibleMoves){
+        if(currentBoard.gameState == GameState::BlackWon || currentBoard.gameState == GameState::WhiteWon){
+            cout << 1 << endl;
+            return;
+        }
+    }
+    cout << possibleMoves.size() << endl;
 }
 
