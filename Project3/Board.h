@@ -85,9 +85,14 @@ public:
     // Count how many capture lines each pawn is in
     [[nodiscard]] std::vector<CoordinateLine> GetCaptureLines() const;
 
+
+private: // helpers
+    void FillSetWithPossibleBoards(Board &currentBoard, std::unordered_set<Board> &boardsSet);
+
     friend std::hash<Board>;
 };
 
+// https://stackoverflow.com/questions/20511347/a-good-hash-function-for-a-vector
 template<>
 struct std::hash<std::vector<char>> {
     std::size_t operator()(const std::vector<char> &board) const {

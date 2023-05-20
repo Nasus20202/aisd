@@ -70,8 +70,9 @@ void Game::DoMove() {
     cin >> from >> to;
     board.DoMove(from, to);
     unordered_set<Board> possibleBoards = board.PossibleBoardsAfterCapture();
-    cout << "Possible boards after capture:" << endl;
+    /*cout << "Possible boards after capture:" << endl;
     for(auto &possibleBoard : possibleBoards)
         possibleBoard.PrintBoard();
+    cout << "That's all" << endl;*/
 
 }

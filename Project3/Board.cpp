@@ -401,24 +401,24 @@ int Board::MaxCaptureLines() {
 }
 
 unordered_set<Board> Board::PossibleBoardsAfterCapture() {
-    auto compare = [](const Board &b1, const Board &b2) { return b1 == b2; };
     unordered_set<Board> boards;
-    vector<Board::CoordinateLine> captureLines = GetCaptureLines();
-    const int maxHeight = GetMaxHeight();
-    vector<vector<Board::CoordinateLine*>> captureLinesPerTile(maxHeight*maxHeight, vector<Board::CoordinateLine*>());
-    for(auto &line : captureLines){
-        for(auto &coordinate : line){
-            captureLinesPerTile[coordinate.letter*maxHeight+ coordinate.number].push_back(&line);
-        }
-    }
-    for(auto &line : captureLines){
-        Board board = *this;
-        for(auto &coordinate : line){
-            board.RemovePawn(coordinate);
-        }
-        boards.insert(board);
-    }
+    FillSetWithPossibleBoards(*this, boards);
     return boards;
+}
+
+void Board::FillSetWithPossibleBoards(Board &currentBoard, unordered_set<Board> &boardsSet){
+    vector<Board::CoordinateLine> captureLines = currentBoard.GetCaptureLines();
+    if(captureLines.empty()){
+        boardsSet.insert(currentBoard);
+        return;
+    }
+    for(auto &line : captureLines){
+        Board nextBoard = currentBoard;
+        for(auto &coordinate : line){
+            nextBoard.RemovePawn(coordinate);
+        }
+        FillSetWithPossibleBoards(nextBoard, boardsSet);
+    }
 }
 
 bool Board::operator==(const Board &other) const {
