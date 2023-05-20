@@ -158,9 +158,19 @@ void Board::DoMove(Coordinate from, Coordinate to) {
     if(gameState == InProgress)
         lastCommand = tempBoard.lastCommand;
     gameState = tempBoard.gameState;
-    if(gameState != InProgress)
+    if(gameState == BadMove)
         return;
     *this = tempBoard;
+    int freeTiles = 0;
+    for(int i = 0; i < GetMaxHeight(); i++)
+        if(board[i] == emptyCode)
+            freeTiles++;
+    if(freeTiles == 0)
+        gameState = DeadLock;
+    if(whitePawns == 0)
+        gameState = BlackWon;
+    else if(blackPawns == 0)
+        gameState = WhiteWon;
 }
 
 vector<Coordinate> Board::GetNeighbours(Coordinate from) const {
@@ -533,4 +543,4 @@ bool Coordinate::operator==(Coordinate &other) const {
     return letter == other.letter && number == other.number;
 }
 
-Board::CaptureLine::CaptureLine(const Board::CoordinateLine& coordinates, char color) : coordinates(coordinates), color(color) {}
+Board::CaptureLine::CaptureLine(Board::CoordinateLine coordinates, char color) : coordinates(std::move(coordinates)), color(color) {}
