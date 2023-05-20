@@ -35,9 +35,10 @@ private:
     std::vector<char> board;
 public:
     typedef std::vector<Coordinate> CoordinateLine;
-    struct Compare {
-        public: Compare();
-            std::function<bool(const Board&, const Board&)> cmp;
+    struct CaptureLine {
+        CoordinateLine coordinates;
+        char color;
+        CaptureLine(CoordinateLine coordinates, char color);
     };
 
     static const char blackCode = 'B', whiteCode = 'W', emptyCode = '_';
@@ -73,7 +74,8 @@ public:
     std::unordered_set<Board> PossibleBoardsAfterCapture();
     [[nodiscard]] bool IsInBounds(Coordinate coordinate) const;
     bool IsMoveValid(Coordinate from, Coordinate to) const;
-    void RemovePawn(Coordinate coordinate);
+    void RemovePawn(Coordinate coordinate, char lineColor = emptyCode);
+    void RemoveCaptureLine(const Board::CaptureLine &captureLine);
     int MaxCaptureLines(); // returns the maximum number of capture lines a pawn is in
     [[nodiscard]] std::vector<std::vector<int>> GetCaptureLinesCount() const; // returns in how many capture lines each pawn is in
 
@@ -86,7 +88,7 @@ public:
     [[nodiscard]] std::vector<CoordinateLine> GetLines() const;
 
     // Count how many capture lines each pawn is in
-    [[nodiscard]] std::vector<CoordinateLine> GetCaptureLines() const;
+    [[nodiscard]] std::vector<CaptureLine> GetCaptureLines() const;
 
 
 private: // helpers

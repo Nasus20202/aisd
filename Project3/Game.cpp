@@ -64,8 +64,11 @@ void Game::PrintGameState() {
 }
 
 void Game::DoMove() {
-    Coordinate from, to;
-    cin >> from >> to;
+    Coordinate from, to; char c;
+    cin >> from >> c;
+    if(c != '-')
+        cin.putback(c);
+    cin >> to;
     board.DoMove(from, to);
     unordered_set<Board> possibleBoards = board.PossibleBoardsAfterCapture();
     cout << "Possible boards after capture:" << endl;

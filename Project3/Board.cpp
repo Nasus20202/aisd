@@ -1,6 +1,7 @@
 #include "Board.h"
 #include <iostream>
 #include <string>
+#include <utility>
 
 using namespace std;
 
@@ -123,10 +124,12 @@ void Board::PushPawns(Coordinate from, Coordinate to) {
     lastCommand.to = to.Increment();
     lastCommand.color = color;
     if(IsMoveValid(from, to) && MovePawns(from, to)) {
-        if (currentPlayer == blackCode)
-            blackPawns--;
-        else
-            whitePawns--;
+        if (currentPlayer == blackCode) {
+            blackPawns--; blackPawnsOnBoard++;
+        }
+        else {
+            whitePawns--; blackPawnsOnBoard++;
+        }
         currentPlayer = (currentPlayer == blackCode) ? whiteCode : blackCode;
     }
     else {
@@ -361,60 +364,69 @@ vector<Board::CoordinateLine> Board::GetLines() const {
     return lines;
 }
 
-vector<Board::CoordinateLine> Board::GetCaptureLines() const {
-    vector<vector<Coordinate>> captureLines;
+vector<Board::CaptureLine> Board::GetCaptureLines() const {
+    vector<CaptureLine> captureLines;
     vector<vector<Coordinate>> lines = GetLines();
     for(auto &line : lines){
         vector<Coordinate> currentCaptureLine;
+        char color = emptyCode;
         int currentWhite = 0, currentBlack = 0; bool isCaptureLine = false;
-        for(auto &coordinate : line){
+        for(auto &coordinate : line) {
             char currentColor = GetTile(coordinate);
-            if(currentColor != emptyCode)
+            if (currentColor != emptyCode)
                 currentCaptureLine.push_back(coordinate);
-            if(currentColor == whiteCode)
+            if (currentColor == whiteCode)
                 currentWhite++;
             else
                 currentWhite = 0;
-            if(currentColor == blackCode)
+            if (currentColor == blackCode)
                 currentBlack++;
             else
                 currentBlack = 0;
-            if(currentWhite >= pawnsToCollect || currentBlack >= pawnsToCollect)
+            if (currentWhite >= pawnsToCollect) {
+                color = whiteCode;
                 isCaptureLine = true;
+            }
+            if( currentBlack >= pawnsToCollect) {
+                color = currentColor;
+                isCaptureLine = true;
+            }
             if(currentColor == emptyCode){
                 if(isCaptureLine){
-                    captureLines.push_back(currentCaptureLine);
+                    captureLines.emplace_back(currentCaptureLine, color);
                 }
                 currentCaptureLine.clear();
                 isCaptureLine = false;
             }
         }
         if(isCaptureLine)
-            captureLines.push_back(currentCaptureLine);
+            captureLines.emplace_back(currentCaptureLine, color);
     }
     return captureLines;
 }
 
-void Board::RemovePawn(Coordinate coordinate) {
-    char color = GetTile(coordinate);
-    if(color == currentPlayer){
-        if(color == whiteCode)
+void Board::RemovePawn(Coordinate coordinate, char lineColor) {
+    if(lineColor == emptyCode)
+        lineColor = currentPlayer;
+    char tileColor = GetTile(coordinate);
+    if(tileColor == lineColor){
+        if(tileColor == whiteCode)
             whitePawns++;
         else
             blackPawns++;
     }
-    if(color == whiteCode)
+    if(tileColor == whiteCode)
         whitePawnsOnBoard--;
-    else if(color == blackCode)
+    else if(tileColor == blackCode)
         blackPawnsOnBoard--;
     SetTile(coordinate, emptyCode);
 }
 
 vector<vector<int>> Board::GetCaptureLinesCount() const {
     vector<vector<int>> captureLinesCount(GetMaxHeight(), vector<int>(GetMaxHeight(), 0));
-    vector<vector<Coordinate>> captureLines = GetCaptureLines();
+    vector<CaptureLine> captureLines = GetCaptureLines();
     for(auto &line : captureLines){
-        for(auto &coordinate : line){
+        for(auto &coordinate : line.coordinates){
             captureLinesCount[coordinate.letter][coordinate.number]++;
         }
     }
@@ -440,17 +452,22 @@ unordered_set<Board> Board::PossibleBoardsAfterCapture() {
 }
 
 void Board::FillSetWithPossibleBoards(Board &currentBoard, unordered_set<Board> &boardsSet){
-    vector<Board::CoordinateLine> captureLines = currentBoard.GetCaptureLines();
+    vector<CaptureLine> captureLines = currentBoard.GetCaptureLines();
     if(captureLines.empty()){
         boardsSet.insert(currentBoard);
         return;
     }
     for(auto &line : captureLines){
         Board nextBoard = currentBoard;
-        for(auto &coordinate : line){
-            nextBoard.RemovePawn(coordinate);
-        }
+        nextBoard.RemoveCaptureLine(line);
         FillSetWithPossibleBoards(nextBoard, boardsSet);
+    }
+}
+
+
+void Board::RemoveCaptureLine(const Board::CaptureLine &captureLine) {
+    for(auto &coordinate : captureLine.coordinates){
+        RemovePawn(coordinate, captureLine.color);
     }
 }
 
@@ -523,4 +540,9 @@ Coordinate Coordinate::Increment() const {
 
 bool Coordinate::operator==(Coordinate &other) const {
     return letter == other.letter && number == other.number;
+}
+
+Board::CaptureLine::CaptureLine(Board::CoordinateLine coordinates, char color) {
+    this->coordinates = std::move(coordinates);
+    this->color = color;
 }
