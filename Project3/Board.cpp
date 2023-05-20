@@ -1,5 +1,6 @@
 #include "Board.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -36,13 +37,37 @@ int Board::GetMaxHeight() const {
 }
 
 void Board::LoadGameBoard() {
-    int lineLength = size;
+    int lineLength = size; blackPawnsOnBoard = 0; whitePawnsOnBoard = 0;
     vector<vector<Coordinate>> coordinates = GetStraightLines();
+    int rows = 0;
     for(int line = 0; line < coordinates.size(); line++){
-        for(auto &coordinate : coordinates[line]){
-            char color;
-            cin >> color;
-            SetTile(coordinate, color);
+        int columns = 0;
+        char color = ' '; bool tooLong = false;
+        while(color == ' ' || color == '\n')
+            color = (char) cin.get();
+        while(true) {
+            if(color == '\n') {
+                rows++; break;
+            }
+            while (color == ' ') {
+                color = (char) cin.get();
+            }
+            if(columns == lineLength) {
+                tooLong = true;
+                break;
+            }
+            if(color == whiteCode)
+                whitePawnsOnBoard++;
+            else if(color == blackCode)
+                blackPawnsOnBoard++;
+            SetTile(coordinates[line][columns], color);
+            color = (char) cin.get();
+            columns++;
+        }
+        if(columns < lineLength || tooLong) {
+            cout << "WRONG_BOARD_ROW_LENGTH" << endl;
+            gameState = InvalidInput;
+            return;
         }
         if(line < size - 1)
             lineLength++;
@@ -85,6 +110,10 @@ void Board::PrintGameState() const {
             break;
         case DeadLock:
             cout << "dead_lock " << lastCommand.color << endl;
+            break;
+        case InvalidInput:
+            cout << "invalid_input" << endl;
+            break;
     }
 }
 
@@ -118,7 +147,7 @@ void Board::DoMove(Coordinate from, Coordinate to) {
     *this = tempBoard;
 }
 
-vector<Coordinate> Board::GetNeighbours(Coordinate from) {
+vector<Coordinate> Board::GetNeighbours(Coordinate from) const {
     vector<Coordinate> neighbours(6);
     vector<Coordinate> possibleNeighbours(6);
     possibleNeighbours.emplace_back(from.letter, from.number - 1); // left
@@ -148,7 +177,7 @@ vector<Coordinate> Board::GetNeighbours(Coordinate from) {
     return neighbours;
 }
 
-bool Board::IsMoveValid(Coordinate from, Coordinate to) {
+bool Board::IsMoveValid(Coordinate from, Coordinate to) const {
     if(IsInBounds(from))
         return false;
     if(!IsInBounds(to))
@@ -374,10 +403,14 @@ void Board::RemovePawn(Coordinate coordinate) {
         else
             blackPawns++;
     }
+    if(color == whiteCode)
+        whitePawnsOnBoard--;
+    else if(color == blackCode)
+        blackPawnsOnBoard--;
     SetTile(coordinate, emptyCode);
 }
 
-vector<vector<int>> Board::GetCaptureLinesCount() {
+vector<vector<int>> Board::GetCaptureLinesCount() const {
     vector<vector<int>> captureLinesCount(GetMaxHeight(), vector<int>(GetMaxHeight(), 0));
     vector<vector<Coordinate>> captureLines = GetCaptureLines();
     for(auto &line : captureLines){

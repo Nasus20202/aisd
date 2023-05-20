@@ -9,7 +9,8 @@ enum GameState {
     BlackWon,
     WhiteWon,
     BadMove,
-    DeadLock
+    DeadLock,
+    InvalidInput
 };
 
 
@@ -47,6 +48,8 @@ public:
     int whiteStartingPawns;
     int blackPawns;
     int whitePawns;
+    int blackPawnsOnBoard = 0;
+    int whitePawnsOnBoard = 0;
     char currentPlayer;
     GameState gameState = InProgress;
     Command lastCommand;
@@ -69,13 +72,13 @@ public:
     void DoMove(Coordinate from, Coordinate to);
     std::unordered_set<Board> PossibleBoardsAfterCapture();
     [[nodiscard]] bool IsInBounds(Coordinate coordinate) const;
-    bool IsMoveValid(Coordinate from, Coordinate to);
+    bool IsMoveValid(Coordinate from, Coordinate to) const;
     void RemovePawn(Coordinate coordinate);
     int MaxCaptureLines(); // returns the maximum number of capture lines a pawn is in
-    std::vector<std::vector<int>> GetCaptureLinesCount(); // returns in how many capture lines each pawn is in
+    [[nodiscard]] std::vector<std::vector<int>> GetCaptureLinesCount() const; // returns in how many capture lines each pawn is in
 
 
-    std::vector<Coordinate> GetNeighbours(Coordinate from);
+    [[nodiscard]] std::vector<Coordinate> GetNeighbours(Coordinate from) const;
     // Generate all possible straight lines on the board
     [[nodiscard]] std::vector<CoordinateLine> GetUpLines() const;
     [[nodiscard]] std::vector<CoordinateLine> GetStraightLines() const;
