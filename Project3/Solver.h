@@ -7,6 +7,6 @@ class Solver {
 private:
     Board board;
 public:
-    Solver(const Board& board);
+    explicit Solver(const Board& board);
     [[nodiscard]] std::unordered_set<Board> GetPossibleMoves() const;
 };
