@@ -85,9 +85,15 @@ void Board::LoadGameBoard() {
         gameState = InvalidInput;
         return;
     }
-    // If any capture is possible, do first one
-    unordered_set<Board> boards = PossibleBoardsAfterCapture();
-    *this = *boards.begin();
+    vector<CaptureLine> captureLines = GetCaptureLines();
+    if(!captureLines.empty()) {
+        if(captureLines.size() == 1)
+            cout << "ERROR_FOUND_1_ROW_OF_LENGTH_K" << endl;
+        else
+            cout << "ERROR_FOUND_" << captureLines.size() << "_ROWS_OF_LENGTH_K" << endl;
+        gameState = InvalidInput;
+        return;
+    }
     cout << "BOARD_STATE_OK" << endl;
 }
 
