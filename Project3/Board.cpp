@@ -1,7 +1,6 @@
 #include "Board.h"
 #include <iostream>
 #include <string>
-#include <utility>
 
 using namespace std;
 
@@ -47,11 +46,11 @@ void Board::LoadGameBoard() {
         while(color == ' ' || color == '\n')
             color = (char) cin.get();
         while(true) {
+            while (color != blackCode && color != whiteCode && color != emptyCode && color != '\n') {
+                color = (char) cin.get();
+            }
             if(color == '\n') {
                 rows++; break;
-            }
-            while (color == ' ') {
-                color = (char) cin.get();
             }
             if(columns == lineLength) {
                 tooLong = true;
@@ -155,14 +154,16 @@ void Board::PushPawns(Coordinate from, Coordinate to) {
 }
 
 
-void Board::DoMove(Coordinate from, Coordinate to) {
+MoveStatus Board::DoMove(Coordinate from, Coordinate to) {
+    moveStatus = MoveStatus::Valid;
     Board tempBoard = *this;
     tempBoard.PushPawns(from.Decrement(), to.Decrement()); // Decrementing to match the indexing of the board
     if(gameState == InProgress)
         lastCommand = tempBoard.lastCommand;
     gameState = tempBoard.gameState;
+    wrongCoordinate = tempBoard.wrongCoordinate;
     if(gameState == BadMove)
-        return;
+        return tempBoard.moveStatus;
     *this = tempBoard;
     int freeTiles = 0;
     for(int i = 0; i < GetMaxHeight(); i++)
@@ -174,11 +175,12 @@ void Board::DoMove(Coordinate from, Coordinate to) {
         gameState = BlackWon;
     else if(blackPawns == 0)
         gameState = WhiteWon;
+    return moveStatus;
 }
 
 vector<Coordinate> Board::GetNeighbours(Coordinate from) const {
-    vector<Coordinate> neighbours(6);
-    vector<Coordinate> possibleNeighbours(6);
+    vector<Coordinate> neighbours;
+    vector<Coordinate> possibleNeighbours;
     possibleNeighbours.emplace_back(from.letter, from.number - 1); // left
     possibleNeighbours.emplace_back(from.letter, from.number + 1); // right
     if(from.letter < size - 1){
@@ -206,11 +208,28 @@ vector<Coordinate> Board::GetNeighbours(Coordinate from) const {
     return neighbours;
 }
 
-bool Board::IsMoveValid(Coordinate from, Coordinate to) const {
-    if(IsInBounds(from))
+bool Board::IsMoveValid(Coordinate from, Coordinate to) {
+    bool fromIsOnCircumference = IsOnCircumference(from);
+    if(!IsInBounds(from) && !fromIsOnCircumference) {
+        moveStatus = MoveStatus::InvalidIndex;
+        wrongCoordinate = from;
         return false;
-    if(!IsInBounds(to))
+    }
+    else if(!fromIsOnCircumference) {
+        moveStatus = MoveStatus::InvalidStartingPoint;
+        wrongCoordinate = from;
         return false;
+    }
+    if(IsOnCircumference(to)) {
+        moveStatus = MoveStatus::InvalidDestination;
+        wrongCoordinate = to;
+        return false;
+    }
+    if(!IsInBounds(to)) {
+        moveStatus = MoveStatus::InvalidIndex;
+        wrongCoordinate = to;
+        return false;
+    }
     vector<Coordinate> neighbours = GetNeighbours(from);
     bool found = false;
     for(auto & neighbour : neighbours){
@@ -219,14 +238,18 @@ bool Board::IsMoveValid(Coordinate from, Coordinate to) const {
             break;
         }
     }
-    if(!found)
+    if(!found) {
+        moveStatus = MoveStatus::UnknownDirection;
         return false;
+    }
     return true;
 }
 
 bool Board::MovePawns(Coordinate from, Coordinate to) {
-    if(!IsInBounds(to))
+    if(!IsInBounds(to)) {
+        moveStatus = MoveStatus::FullRow;
         return false;
+    }
     char toColor = GetTile(to);
     bool isOk = true;
     if(toColor != emptyCode)
@@ -250,6 +273,17 @@ bool Board::IsInBounds(Coordinate coordinate) const {
     if(coordinate.number < 0 || coordinate.number > maxNumber)
         return false;
     return true;
+}
+
+bool Board::IsOnCircumference(Coordinate coordinate) const {
+    vector<Coordinate> neighbours = GetNeighbours(coordinate);
+    if(IsInBounds(coordinate))
+        return false;
+    for(auto & neighbour : neighbours){
+        if(IsInBounds(neighbour))
+            return true;
+    }
+    return false;
 }
 
 Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) const {
@@ -496,7 +530,7 @@ std::ostream &operator<<(ostream &os, const Coordinate &c) {
     string s;
     int letter = c.letter;
     while(letter >= 0){
-        s +=  char(letter % size + 'A');
+        s +=  char(letter % size + 'a');
         letter /= size;
         letter--;
     }

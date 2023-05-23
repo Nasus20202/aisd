@@ -88,8 +88,23 @@ void Game::DoMove() {
     if(c != '-')
         cin.putback(c);
     cin >> to;
-    board.DoMove(from, to);
+    MoveStatus status = board.DoMove(from, to);
     board = RemoveCapturedPawns(board);
+    Coordinate wrong = board.wrongCoordinate.Increment();
+    switch (status) {
+        case MoveStatus::Valid:
+            cout << "MOVE_COMMITTED" << endl; break;
+        case MoveStatus::InvalidIndex:
+            cout << "BAD_MOVE_" << wrong << "_IS_WRONG_INDEX" << endl; break;
+        case MoveStatus::InvalidStartingPoint:
+            cout << "BAD_MOVE_" << wrong << "_IS_WRONG_STARTING_FIELD" << endl; break;
+        case MoveStatus::InvalidDestination:
+            cout << "BAD_MOVE_" << wrong << "_IS_WRONG_DESTINATION_FIELD" << endl; break;
+        case MoveStatus::FullRow:
+            cout << "BAD_MOVE_ROW_IS_FULL" << endl; break;
+        case UnknownDirection:
+            cout << "UNKNOWN_MOVE_DIRECTION" << endl; break;
+    }
 }
 
 Board Game::RemoveCapturedPawns(Board &nextBoard) {

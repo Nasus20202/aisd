@@ -12,6 +12,15 @@ enum GameState {
     InvalidInput
 };
 
+enum MoveStatus {
+    Valid,
+    InvalidIndex,
+    UnknownDirection,
+    InvalidStartingPoint,
+    InvalidDestination,
+    FullRow
+};
+
 
 struct Coordinate {
     int letter, number;
@@ -53,6 +62,9 @@ public:
     char currentPlayer;
     GameState gameState = InProgress;
     Command lastCommand;
+    MoveStatus moveStatus = Valid;
+    Coordinate wrongCoordinate;
+
 
     explicit Board(int boardSize = 4, int pawnsToCollect =  4, int blackStartingPawns = 15, int whiteStartingPawns = 15, int blackPawns = 12, int whitePawns = 12, char currentPlayer = whiteCode);
     void SetTile(Coordinate coordinate, char color);
@@ -69,10 +81,10 @@ public:
 
     [[nodiscard]] Coordinate NextCoordinate(Coordinate from, Coordinate to) const;
     bool MovePawns(Coordinate from, Coordinate to);
-    void DoMove(Coordinate from, Coordinate to);
+    MoveStatus DoMove(Coordinate from, Coordinate to);
     std::unordered_set<Board> PossibleBoardsAfterCapture();
     [[nodiscard]] bool IsInBounds(Coordinate coordinate) const;
-    bool IsMoveValid(Coordinate from, Coordinate to) const;
+    bool IsMoveValid(Coordinate from, Coordinate to);
     void RemovePawn(Coordinate coordinate, char lineColor = emptyCode);
     void RemoveCaptureLine(const Board::CaptureLine &captureLine);
 
@@ -91,6 +103,8 @@ private: // helpers
     void FillSetWithPossibleBoards(Board &currentBoard, std::unordered_set<Board> &boardsSet);
 
     friend std::hash<Board>;
+
+    bool IsOnCircumference(Coordinate coordinate) const;
 };
 
 // https://stackoverflow.com/questions/20511347/a-good-hash-function-for-a-vector
