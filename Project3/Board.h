@@ -88,6 +88,7 @@ public:
     bool IsMoveValid(Coordinate from, Coordinate to);
     void RemovePawn(Coordinate coordinate, char lineColor = emptyCode);
     void RemoveCaptureLine(const Board::CaptureLine &captureLine);
+    void RemoveSimpleCaptures();
 
     [[nodiscard]] std::vector<Coordinate> GetNeighbours(Coordinate from) const;
     // Generate all possible straight lines on the board

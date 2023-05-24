@@ -531,6 +531,28 @@ bool Board::operator==(const Board &other) const {
     return true;
 }
 
+void Board::RemoveSimpleCaptures() {
+    vector<CaptureLine> captureLines = GetCaptureLines();
+    vector<vector<CaptureLine*>> captureLinesField(GetMaxHeight()*GetMaxHeight(), vector<CaptureLine*>());
+    for(auto &captureLine : captureLines){
+        for(auto &coordinate : captureLine.coordinates){
+            captureLinesField[coordinate.number*GetMaxHeight() + coordinate.letter].push_back(&captureLine);
+        }
+    }
+    for(auto &captureLine : captureLines){
+        bool isSimpleCapture = true;
+        for(auto &coordinate : captureLine.coordinates){
+            if(captureLinesField[coordinate.number*GetMaxHeight() + coordinate.letter].size() > 1){
+                isSimpleCapture = false;
+                break;
+            }
+        }
+        if(isSimpleCapture){
+            RemoveCaptureLine(captureLine);
+        }
+    }
+}
+
 std::ostream &operator<<(ostream &os, const Coordinate &c) {
     const int size = 26;
     string s;

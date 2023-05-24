@@ -13,7 +13,7 @@ private:
     void PrintGameState() const;
     void Query();
     void DoMove();
-    Board RemoveCapturedPawns(Board& nextBoard);
+    void RemoveCapturedPawns();
 
     // Solver
     void GenerateAllPossibleMoves();
