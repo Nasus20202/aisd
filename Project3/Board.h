@@ -64,6 +64,7 @@ public:
     Command lastCommand;
     MoveStatus moveStatus = Valid;
     Coordinate wrongCoordinate;
+    std::vector<CoordinateLine> lines; // all possible lines on the board
 
 
     explicit Board(int boardSize = 4, int pawnsToCollect =  4, int blackStartingPawns = 15, int whiteStartingPawns = 15, int blackPawns = 12, int whitePawns = 12, char currentPlayer = whiteCode);

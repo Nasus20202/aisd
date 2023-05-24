@@ -1,5 +1,4 @@
 #include "Solver.h"
-#include <iostream>
 
 using namespace std;
 
@@ -8,8 +7,7 @@ Solver::Solver(const Board &board) : board(board) {}
 unordered_set<Board> Solver::GetPossibleMoves() const {
     unordered_set<Board> possibleMoves;
     Board biggerBoard(board.size + 1);
-    vector<Board::CoordinateLine> lines = biggerBoard.GetLines();
-    for(auto& line : lines){
+    for(auto& line : biggerBoard.lines){
         if(line.size() < 2)
             continue;
         Coordinate firstFrom = line[0], firstTo = line[1];

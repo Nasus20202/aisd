@@ -18,6 +18,7 @@ Board::Board(int boardSize, int pawnsToCollect, int blackStartingPawns, int whit
     char c = emptyCode;
     for(int i = 0; i < maxH*maxH; i++)
         board.push_back(c);
+    lines = GetLines();
 }
 
 void Board::SetTile(Coordinate coordinate, char color) {
@@ -348,7 +349,7 @@ Coordinate Board::NextCoordinate(Coordinate from, Coordinate to) const {
 
 
 vector<Board::CoordinateLine> Board::GetUpLines() const {
-    vector<vector<Coordinate>> lines;
+    vector<vector<Coordinate>> upLines;
     for(int i = 0; i < GetMaxHeight(); i++){
         Coordinate from(i, -1);
         Coordinate to(i, 0);
@@ -359,13 +360,13 @@ vector<Board::CoordinateLine> Board::GetUpLines() const {
             from = to;
             to = next;
         }
-        lines.push_back(line);
+        upLines.push_back(line);
     }
-    return lines;
+    return upLines;
 }
 
 vector<Board::CoordinateLine> Board::GetStraightLines() const {
-    vector<vector<Coordinate>> lines;
+    vector<vector<Coordinate>> straightLines;
     for(int i = size-1; i > 0; i--){
         Coordinate from(-1, i-1);
         Coordinate to(0, i);
@@ -376,7 +377,7 @@ vector<Board::CoordinateLine> Board::GetStraightLines() const {
             from = to;
             to = next;
         }
-        lines.push_back(line);
+        straightLines.push_back(line);
     }
     for(int i = 0; i < size; i++){
         Coordinate from(i-1, -1);
@@ -388,13 +389,13 @@ vector<Board::CoordinateLine> Board::GetStraightLines() const {
             from = to;
             to = next;
         }
-        lines.push_back(line);
+        straightLines.push_back(line);
     }
-    return lines;
+    return straightLines;
 }
 
 vector<Board::CoordinateLine> Board::GetDownLines() const {
-    vector<vector<Coordinate>> lines;
+    vector<vector<Coordinate>> downLines;
     for(int i = 0; i < size; i++){
         Coordinate from(-1, i);
         Coordinate to(0, i);
@@ -405,7 +406,7 @@ vector<Board::CoordinateLine> Board::GetDownLines() const {
             from = to;
             to = next;
         }
-        lines.push_back(line);
+        downLines.push_back(line);
     }
     for(int i = 1; i < size; i++){
         Coordinate from(i-1, size+i-1);
@@ -417,22 +418,21 @@ vector<Board::CoordinateLine> Board::GetDownLines() const {
             from = to;
             to = next;
         }
-        lines.push_back(line);
+        downLines.push_back(line);
     }
-    return lines;
+    return downLines;
 }
 
 vector<Board::CoordinateLine> Board::GetLines() const {
-    vector<vector<Coordinate>> lines, upLines = GetUpLines(), straightLines = GetStraightLines(), downLines = GetDownLines();
-    lines.insert(lines.end(), upLines.begin(), upLines.end());
-    lines.insert(lines.end(), straightLines.begin(), straightLines.end());
-    lines.insert(lines.end(), downLines.begin(), downLines.end());
-    return lines;
+    vector<vector<Coordinate>> allLines, upLines = GetUpLines(), straightLines = GetStraightLines(), downLines = GetDownLines();
+    allLines.insert(allLines.end(), upLines.begin(), upLines.end());
+    allLines.insert(allLines.end(), straightLines.begin(), straightLines.end());
+    allLines.insert(allLines.end(), downLines.begin(), downLines.end());
+    return allLines;
 }
 
 vector<Board::CaptureLine> Board::GetCaptureLines() const {
     vector<CaptureLine> captureLines;
-    vector<vector<Coordinate>> lines = GetLines();
     for(auto &line : lines){
         vector<Coordinate> currentCaptureLine;
         char color = emptyCode;
