@@ -76,10 +76,10 @@ void Board::LoadGameBoard() {
             lineLength--;
     }
     bool rightNumberOfPawns = true;
-    if(whitePawns + whitePawnsOnBoard != whiteStartingPawns) {
+    if(whitePawns + whitePawnsOnBoard > whiteStartingPawns) {
         cout << "WRONG_WHITE_PAWNS_NUMBER" << endl; rightNumberOfPawns = false;
     }
-    else if(blackPawns + blackPawnsOnBoard != blackStartingPawns) {
+    else if(blackPawns + blackPawnsOnBoard > blackStartingPawns) {
         cout << "WRONG_BLACK_PAWNS_NUMBER" << endl; rightNumberOfPawns = false;
     }
     if(!rightNumberOfPawns) {

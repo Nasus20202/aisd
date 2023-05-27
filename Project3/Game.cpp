@@ -91,23 +91,29 @@ void Game::DoMove() {
     MoveStatus status = board.DoMove(from, to);
     RemoveCapturedPawns();
     Coordinate wrong = board.wrongCoordinate.Increment();
+    if(status == Valid)
+        status = board.moveStatus;
     switch (status) {
-        case MoveStatus::Valid:
+        case Valid:
             cout << "MOVE_COMMITTED" << endl; break;
-        case MoveStatus::InvalidIndex:
+        case InvalidIndex:
             cout << "BAD_MOVE_" << wrong << "_IS_WRONG_INDEX" << endl; break;
-        case MoveStatus::InvalidStartingPoint:
+        case InvalidStartingPoint:
             cout << "BAD_MOVE_" << wrong << "_IS_WRONG_STARTING_FIELD" << endl; break;
-        case MoveStatus::InvalidDestination:
+        case InvalidDestination:
             cout << "BAD_MOVE_" << wrong << "_IS_WRONG_DESTINATION_FIELD" << endl; break;
-        case MoveStatus::FullRow:
+        case FullRow:
             cout << "BAD_MOVE_ROW_IS_FULL" << endl; break;
         case UnknownDirection:
             cout << "UNKNOWN_MOVE_DIRECTION" << endl; break;
+        case WrongCaptureLineIndex:
+            cout << "WRONG_INDEX_OF_CHOSEN_ROW" << endl; break;
+        case WrongCaptureLineColor:
+            cout << "WRONG_COLOR_OF_CHOSEN_ROW" << endl; break;
     }
 }
 
-void Game::RemoveCapturedPawns() {
+MoveStatus Game::RemoveCapturedPawns() {
     board.RemoveSimpleCaptures();
     vector<Board::CaptureLine> captureLines = board.GetCaptureLines();
     while(!captureLines.empty()){
@@ -119,39 +125,55 @@ void Game::RemoveCapturedPawns() {
             if(temp != ':')
                 cin.putback(temp);
             color = (char) toupper(color);
-            vector<Coordinate> chosenCoordinates(board.pawnsToCollect), coordinates;
-            for(auto& coordinate : chosenCoordinates){
-                Coordinate c;
-                cin >> c;
-                coordinate = c.Decrement();
-            }
-            for(auto& captureLine : captureLines){
-                vector<bool> chosenCoordinatesFound(chosenCoordinates.size(), false);
-                for(auto& coordinate : captureLine.coordinates){
-                    for(int i = 0; i < int(chosenCoordinates.size()); i++){
-                        if(coordinate == chosenCoordinates[i]){
-                            chosenCoordinatesFound[i] = true;
+            Coordinate first, last;
+            cin >> first >> last;
+            first = first.Decrement();
+            last = last.Decrement();
+            Board::CaptureLine* captureLine = nullptr;
+            for(auto& line : captureLines){
+                //bool firstFound = false, lastFound = false;
+                /*for(auto& coordinate : line.coordinates) {
+                    if(coordinate == first)
+                        firstFound = true;
+                    if(coordinate == last)
+                        lastFound = true;
+                }*/
+
+                int firstIndex = -1, lastIndex = -1;
+                for(int i = 0; i < int(line.coordinates.size()); i++){
+                    if(line.coordinates[i] == first)
+                        firstIndex = i;
+                    if(line.coordinates[i] == last)
+                        lastIndex = i;
+                    if(firstIndex != -1 && lastIndex != -1) {
+                        if(firstIndex > lastIndex)
+                            swap(firstIndex, lastIndex);
+                        int before = firstIndex - 1, after = lastIndex + 1;
+
+                        if(before >= 0 && board.GetTile(line.coordinates[before]) == color)
                             break;
-                        }
+                        if(after < int(line.coordinates.size()) && board.GetTile(line.coordinates[after]) == color)
+                            break;
+                        captureLine = &line; break;
                     }
                 }
-                bool allFound = true;
-                for(bool found : chosenCoordinatesFound){
-                    if(!found){
-                        allFound = false;
-                        break;
-                    }
-                }
-                if(allFound){
-                    coordinates = captureLine.coordinates;
+                if(captureLine != nullptr)
                     break;
-                }
             }
-            board.RemoveCaptureLine(Board::CaptureLine(coordinates, color));
+            if(captureLine == nullptr){
+                board.moveStatus = MoveStatus::WrongCaptureLineIndex;
+                return board.moveStatus;
+            }
+            if(color != captureLine->color){
+                board.moveStatus = MoveStatus::WrongCaptureLineColor;
+                return board.moveStatus;
+            }
+            board.RemoveCaptureLine(*captureLine);
         }
         board.RemoveSimpleCaptures();
         captureLines = board.GetCaptureLines();
     }
+    return board.moveStatus;
 }
 
 void Game::GenerateAllPossibleMoves() {

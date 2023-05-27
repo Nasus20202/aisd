@@ -18,7 +18,9 @@ enum MoveStatus {
     UnknownDirection,
     InvalidStartingPoint,
     InvalidDestination,
-    FullRow
+    FullRow,
+    WrongCaptureLineColor,
+    WrongCaptureLineIndex
 };
 
 
