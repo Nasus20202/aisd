@@ -131,14 +131,6 @@ MoveStatus Game::RemoveCapturedPawns() {
             last = last.Decrement();
             Board::CaptureLine* captureLine = nullptr;
             for(auto& line : captureLines){
-                //bool firstFound = false, lastFound = false;
-                /*for(auto& coordinate : line.coordinates) {
-                    if(coordinate == first)
-                        firstFound = true;
-                    if(coordinate == last)
-                        lastFound = true;
-                }*/
-
                 int firstIndex = -1, lastIndex = -1;
                 for(int i = 0; i < int(line.coordinates.size()); i++){
                     if(line.coordinates[i] == first)
