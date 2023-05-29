@@ -15,9 +15,8 @@ Board::Board(int boardSize, int pawnsToCollect, int blackStartingPawns, int whit
     this->currentPlayer = currentPlayer;
     const int maxH = GetMaxHeight();
     board.resize(maxH*maxH);
-    char c = emptyCode;
     for(int i = 0; i < maxH*maxH; i++)
-        board.push_back(c);
+        board[i] = '\0';
     lines = GetLines();
 }
 
@@ -174,8 +173,8 @@ MoveStatus Board::DoMove(Coordinate from, Coordinate to) {
         return tempBoard.moveStatus;
     *this = tempBoard;
     int freeTiles = 0;
-    for(int i = 0; i < GetMaxHeight(); i++)
-        if(board[i] == emptyCode)
+    for(char c : board)
+        if(c == emptyCode)
             freeTiles++;
     if(freeTiles == 0)
         gameState = DeadLock;
