@@ -78,7 +78,7 @@ public:
 
     void PrintBoard() const;
     void PrintGameState() const;
-    void LoadGameBoard();
+    bool LoadGameBoard();
 
     bool operator==(const Board &other) const;
 

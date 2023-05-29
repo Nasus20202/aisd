@@ -4,6 +4,7 @@
 class Game {
 private:
     bool exit = false;
+    bool boardLoaded = false;
     Board board;
 
     // Game

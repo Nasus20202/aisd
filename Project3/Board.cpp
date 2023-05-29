@@ -37,7 +37,7 @@ int Board::GetMaxHeight() const {
     return 2 * size - 1;
 }
 
-void Board::LoadGameBoard() {
+bool Board::LoadGameBoard() {
     int lineLength = size; blackPawnsOnBoard = 0; whitePawnsOnBoard = 0;
     vector<vector<Coordinate>> coordinates = GetStraightLines();
     int rows = 0;
@@ -68,7 +68,7 @@ void Board::LoadGameBoard() {
         if(columns < lineLength || tooLong) {
             cout << "WRONG_BOARD_ROW_LENGTH" << endl;
             gameState = InvalidInput;
-            return;
+            return false;
         }
         if(line < size - 1)
             lineLength++;
@@ -84,7 +84,7 @@ void Board::LoadGameBoard() {
     }
     if(!rightNumberOfPawns) {
         gameState = InvalidInput;
-        return;
+        return false;
     }
     vector<CaptureLine> captureLines = GetCaptureLines();
     if(!captureLines.empty()) {
@@ -93,9 +93,10 @@ void Board::LoadGameBoard() {
         else
             cout << "ERROR_FOUND_" << captureLines.size() << "_ROWS_OF_LENGTH_K" << endl;
         gameState = InvalidInput;
-        return;
+        return false;
     }
     cout << "BOARD_STATE_OK" << endl;
+    return true;
 }
 
 void Board::PrintBoard() const{

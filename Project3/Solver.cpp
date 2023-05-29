@@ -15,10 +15,16 @@ unordered_set<Board> Solver::GetPossibleMoves() const {
         Board firstBoard = board, lastBoard = board;
         firstBoard.DoMove(firstFrom, firstTo);
         lastBoard.DoMove(lastFrom, lastTo);
-        if(firstBoard.gameState != GameState::BadMove)
-            possibleMoves.insert(firstBoard);
-        if(lastBoard.gameState != GameState::BadMove)
-            possibleMoves.insert(lastBoard);
+        if(firstBoard.gameState != GameState::BadMove) {
+            unordered_set<Board> possibleBoardsAfterCapture = firstBoard.PossibleBoardsAfterCapture();
+            for(auto& possibleBoard : possibleBoardsAfterCapture)
+                possibleMoves.insert(possibleBoard);
+        }
+        if(lastBoard.gameState != GameState::BadMove) {
+            unordered_set<Board> possibleBoardsAfterCapture = lastBoard.PossibleBoardsAfterCapture();
+            for(auto& possibleBoard : possibleBoardsAfterCapture)
+                possibleMoves.insert(possibleBoard);
+        }
     }
     return possibleMoves;
 }

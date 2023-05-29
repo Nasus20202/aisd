@@ -52,11 +52,14 @@ void Game::LoadGameBoard() {
     char currentPlayer;
     cin >> boardSize >> pawnsToCollect >> whiteStartingPawns >> blackStartingPawns >> whitePawns >> blackPawns >> currentPlayer;
     board = Board(boardSize, pawnsToCollect, blackStartingPawns, whiteStartingPawns, blackPawns, whitePawns, currentPlayer);
-    board.LoadGameBoard();
+    boardLoaded = board.LoadGameBoard();
 }
 
 void Game::PrintGameBoard() const {
-    board.PrintBoard();
+    if(boardLoaded)
+        board.PrintBoard();
+    else
+        cout << "EMPTY_BOARD" << endl;
 }
 
 void Game::PrintCoordinates() const {
@@ -173,7 +176,7 @@ void Game::GenerateAllPossibleMoves() {
     unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
     int i = 0;
     for(auto& currentBoard : possibleMoves){
-        cout << ++i << '.' << endl;
+        cout << ++i << ". " << currentBoard.lastCommand.from << '-' << currentBoard.lastCommand.to << endl;
         currentBoard.PrintBoard();
     }
 }
@@ -183,6 +186,7 @@ void Game::GenerateAllPossibleMovesExtended() {
     unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
     for(auto& currentBoard : possibleMoves){
         if(currentBoard.gameState == GameState::BlackWon || currentBoard.gameState == GameState::WhiteWon){
+            cout << currentBoard.lastCommand.from << '-' << currentBoard.lastCommand.to << endl;
             currentBoard.PrintBoard();
             currentBoard.PrintGameState();
             return;
@@ -190,7 +194,7 @@ void Game::GenerateAllPossibleMovesExtended() {
     }
     int i = 0;
     for(auto& currentBoard : possibleMoves){
-        cout << ++i << '.' << endl;
+        cout << ++i << ". " << currentBoard.lastCommand.from << '-' << currentBoard.lastCommand.to << endl;
         currentBoard.PrintBoard();
     }
 }
