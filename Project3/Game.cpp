@@ -202,7 +202,7 @@ void Game::GenerateAllPossibleMovesExtended() {
 void Game::GenerateAllPossibleMovesNumber() {
     Solver solver(board);
     unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
-    cout << possibleMoves.size() << endl;
+    cout << possibleMoves.size() << "_UNIQUE_MOVES" << endl;
 }
 
 void Game::GenerateAllPossibleMovesNumberExtended() {
