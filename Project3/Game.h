@@ -12,6 +12,7 @@ private:
     void PrintGameBoard() const;
     void PrintCoordinates() const;
     void PrintGameState() const;
+    void IsGameOver() const;
     void Query();
     void DoMove();
     MoveStatus RemoveCapturedPawns();

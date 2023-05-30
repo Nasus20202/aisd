@@ -45,6 +45,8 @@ void Game::Query() {
         GenerateAllPossibleMovesNumber();
     else if(input == "GEN_ALL_POS_MOV_NUM_EXT")
         GenerateAllPossibleMovesNumberExtended();
+    else if(input == "IS_GAME_OVER")
+        IsGameOver();
 }
 
 void Game::LoadGameBoard() {
@@ -217,3 +219,23 @@ void Game::GenerateAllPossibleMovesNumberExtended() {
     cout << possibleMoves.size() << endl;
 }
 
+void Game::IsGameOver() const {
+    bool whiteWon = false, blackWon = false;
+    if(board.gameState == WhiteWon)
+        whiteWon = true;
+    else if(board.gameState == BlackWon)
+        blackWon = true;
+    else if(board.gameState == DeadLock){
+        if(board.currentPlayer == Board::whiteCode)
+            blackWon = true;
+        else
+            whiteWon = true;
+    }
+    else if(board.gameState == InProgress){
+        cout << "GAME_IN_PROGRESS" << endl;
+    }
+    if(whiteWon)
+        cout << "THE_WINNER_IS_WHITE" << endl;
+    else if(blackWon)
+        cout << "THE_WINNER_IS_BLACK" << endl;
+}

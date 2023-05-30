@@ -95,6 +95,7 @@ bool Board::LoadGameBoard() {
         return false;
     }
     cout << "BOARD_STATE_OK" << endl;
+    CheckForStateChange();
     return true;
 }
 
@@ -172,16 +173,7 @@ MoveStatus Board::DoMove(Coordinate from, Coordinate to) {
     if(gameState == BadMove)
         return tempBoard.moveStatus;
     *this = tempBoard;
-    int freeTiles = 0;
-    for(char c : board)
-        if(c == emptyCode)
-            freeTiles++;
-    if(freeTiles == 0)
-        gameState = DeadLock;
-    if(whitePawns == 0)
-        gameState = BlackWon;
-    else if(blackPawns == 0)
-        gameState = WhiteWon;
+    CheckForStateChange();
     return moveStatus;
 }
 
@@ -551,6 +543,21 @@ void Board::RemoveSimpleCaptures() {
             RemoveCaptureLine(captureLine);
         }
     }
+}
+
+void Board::CheckForStateChange() {
+    int freeTiles = 0;
+    for(char c : board)
+        if(c == emptyCode)
+            freeTiles++;
+    if(freeTiles == 0){
+        gameState = DeadLock;
+        return;
+    }
+    if(whitePawns == 0)
+        gameState = BlackWon;
+    else if(blackPawns == 0)
+        gameState = WhiteWon;
 }
 
 std::ostream &operator<<(ostream &os, const Coordinate &c) {
