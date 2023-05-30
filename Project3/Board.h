@@ -108,7 +108,7 @@ private: // helpers
 
     friend std::hash<Board>;
 
-    bool IsOnCircumference(Coordinate coordinate) const;
+    [[nodiscard]] bool IsOnCircumference(Coordinate coordinate) const;
 };
 
 // https://stackoverflow.com/questions/20511347/a-good-hash-function-for-a-vector
