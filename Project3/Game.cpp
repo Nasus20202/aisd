@@ -43,7 +43,7 @@ void Game::Query() {
         GenerateAllPossibleMovesExtended();
     else if(input == "GEN_ALL_POS_MOV_NUM")
         GenerateAllPossibleMovesNumber();
-    else if(input == "GEN_ALL_POS_MOV_NUM_EXT")
+    else if(input == "GEN_ALL_POS_MOV_EXT_NUM")
         GenerateAllPossibleMovesNumberExtended();
     else if(input == "IS_GAME_OVER")
         IsGameOver();
@@ -187,10 +187,9 @@ void Game::GenerateAllPossibleMovesExtended() {
     Solver solver(board);
     unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
     for(auto& currentBoard : possibleMoves){
-        if(currentBoard.gameState == GameState::BlackWon || currentBoard.gameState == GameState::WhiteWon){
+        if(currentBoard.gameState == GameState::BlackWon || currentBoard.gameState == GameState::WhiteWon || currentBoard.gameState == GameState::DeadLock){
             cout << currentBoard.lastCommand.from << '-' << currentBoard.lastCommand.to << endl;
             currentBoard.PrintBoard();
-            currentBoard.PrintGameState();
             return;
         }
     }
@@ -211,12 +210,12 @@ void Game::GenerateAllPossibleMovesNumberExtended() {
     Solver solver(board);
     unordered_set<Board> possibleMoves = solver.GetPossibleMoves();
     for(auto& currentBoard : possibleMoves){
-        if(currentBoard.gameState == GameState::BlackWon || currentBoard.gameState == GameState::WhiteWon){
-            cout << 1 << endl;
+        if(currentBoard.gameState == GameState::BlackWon || currentBoard.gameState == GameState::WhiteWon || currentBoard.gameState == GameState::DeadLock){
+            cout << "1_UNIQUE_MOVES" << endl;
             return;
         }
     }
-    cout << possibleMoves.size() << endl;
+    cout << possibleMoves.size() << "_UNIQUE_MOVES" << endl;
 }
 
 void Game::IsGameOver() const {
