@@ -1,5 +1,5 @@
 # Algorytmy i struktury danych
-### Poltechnika Gdańska, Informatyka 2023
+### Politechnika Gdańska, Informatyka 2023
 
 - [Struktury](https://github.com/Nasus20202/aisd/tree/main/Common)
 - [Parser CSS](https://github.com/Nasus20202/aisd/tree/main/Project1)
